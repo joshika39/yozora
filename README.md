@@ -1,6 +1,15 @@
 # Yozora (夜空) dotfiles
 
-## i3
+### Installation
+
+```bash
+
+git clone https://github.com/joshika39/yozora.git ~/.config/yozora
+cd ~/.config/yozora
+
+# Install the dotfiles
+bash shell/bash/update.sh --download
+```
 
 ### Language
 
