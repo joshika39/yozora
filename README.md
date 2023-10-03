@@ -11,10 +11,15 @@ cd ~/.config/yozora
 bash shell/bash/update.sh --download
 ```
 
-### Language
+### Package collection updater
 
-To enable ibus support install these packages: `ibus` `ibus-anthy`
-Run the daemon with: `ibus-daemon -rxRd`
+If you sourced the bashrc file with: `source ~/.bashrc` then you can use the following command to update the package collection:
+
+```bash
+update # This will update the base packages
+
+update <collection-name> # This will update the specified collection
+```
 
 ### Notes
 
