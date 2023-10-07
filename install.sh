@@ -9,6 +9,36 @@ if [ -z "$YOZORA_PATH" ]; then
   exit 1
 fi
 
+# Usage: ./install.sh <package_collection>
+# or if the bashrc is sourced then: `update <package_collection>`
+#
+# -l to list the available package collections
+# -h to display the help message
+
+
+if [ "$1" == "-l" ]; then
+  # Store the available package collections, while removing the `.conf` extension
+  package_array=($(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g'))
+  # Rename the `base` to "(*) base" to indicate that it is the default package collection
+  packages=$(echo "${package_array[@]/base/(*)-base}")
+
+  echo "Available package collections:"
+  for package in $packages; do
+    echo -e "\t-> $package"
+  done
+  exit 0
+fi
+
+
+if [ "$1" == "-h" ]; then
+  echo "Usage: ./install.sh <package_collection>"
+  echo "or if the bashrc is sourced then: update <package_collection>"
+  echo ""
+  echo "-l to list the available package collections"
+  echo "-h to display the help message"
+  exit 0
+fi
+
 if ! [ -z "$1" ]; then
   package_collection=$1
 
