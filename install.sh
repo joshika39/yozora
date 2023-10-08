@@ -12,15 +12,15 @@ fi
 # Usage: ./install.sh <package_collection>
 # or if the bashrc is sourced then: `update <package_collection>`
 #
-# -l to list the available package collections
-# -h to display the help message
+# -l or --list to list the available package collections
+# -h or --help to display the help message
 
 
-if [ "$1" == "-l" ]; then
+if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
   # Store the available package collections, while removing the `.conf` extension
   package_array=($(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g'))
-  # Rename the `base` to "(*) base" to indicate that it is the default package collection
-  packages=$(echo "${package_array[@]/base/(*)-base}")
+  # Remove the `base` package collection from the list
+  package_array=(${package_array[@]/base/})
 
   echo "Available package collections:"
   for package in $packages; do
@@ -30,12 +30,12 @@ if [ "$1" == "-l" ]; then
 fi
 
 
-if [ "$1" == "-h" ]; then
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   echo "Usage: ./install.sh <package_collection>"
   echo "or if the bashrc is sourced then: update <package_collection>"
   echo ""
-  echo "-l to list the available package collections"
-  echo "-h to display the help message"
+  echo "--list, -l to list the available package collections"
+  echo "--help, -h to display the help message"
   exit 0
 fi
 
@@ -49,8 +49,8 @@ if ! [ -z "$1" ]; then
     echo "The package collection $package_collection does not exist"
     # Store the available package collections, while removing the `.conf` extension
     package_array=($(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g'))
-    # Rename the `base` to "(*) base" to indicate that it is the default package collection
-    packages=$(echo "${package_array[@]/base/(*)-base}")
+    # Remove the `base` package collection from the list
+    package_array=(${package_array[@]/base/})
 
     echo "Available package collections:"
     for package in $packages; do
