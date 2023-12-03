@@ -32,6 +32,8 @@ case $TERM in screen*)
   PS1=${PS1}'\[\033k\033\\\]'
 esac
 
+export GPG_TTY=$(tty)
+
 # export GIT_PS1_SHOWDIRTYSTATE=1
 # export PS1='[\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h: \[\e[34m\]\W\e[1;33m$(__git_ps1 " (%s)")\e[0m\[\e[0m\]]\$ '
 # export PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
