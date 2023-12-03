@@ -1,3 +1,6 @@
 # Yozora (夜空) dotfiles
 
-Requried dependencies
+
+
+Requried dependencies: 
+- Aur: `hyperland-git`
