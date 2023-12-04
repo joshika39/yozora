@@ -3,4 +3,4 @@
 
 
 Requried dependencies: 
-- Aur: `hyperland-git`
+- Aur: `hyperland-git hyprpaper-git hyprpicker-git`

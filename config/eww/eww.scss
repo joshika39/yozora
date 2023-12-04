@@ -1,0 +1,20 @@
+$background: #202E4B;
+$foreground: #fff;
+
+/* * {
+  all: unset;
+} */
+
+
+.example_bar {
+  all: unset;
+  background: $background;
+  color: $foreground;
+  box-shadow: 0 2px 3px 2px #06060b;
+  border-radius: 5px;
+  min-height: 10px;
+  min-width: 70px;
+  margin: 50px;
+  // left: 50px;
+  padding: 50px;
+}
