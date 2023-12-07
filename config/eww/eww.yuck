@@ -1,17 +1,16 @@
+(defpoll volume_percent :interval "3s" "amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%'")
+(defpoll mic_percent :interval "3s" "amixer -D pulse sget Capture | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%'")
+(defpoll brightness_percent :interval "5s" "brightnessctl -m -d intel_backlight | awk -F, '{print substr($4, 0, length($4)-1)}' | tr -d '%'")
+(defpoll battery :interval "15s" "./scripts/battery --bat")
+(defpoll battery_status :interval "1m" "./scripts/battery --bat-st")
 
-; Practice Begin
-(defvar foo "initial value")
+
 (defvar time-visible false)
-
-(defwidget labeled-container [name]
-  (box :class "container"
-    name
-    (children)))
 
 (defpoll time :interval "1s"
               :initial "initial-value"  ; optional, defaults to poll at startup
               :run-while time-visible   ; optional, defaults to 'true'
-  `date '+%Y年%m月%d日 %H時%M分'`)
+  `date '+%Y年%m月%d日 %H時%M分 %S秒'`)
 
 (defwindow example_bar
            :class "example_bar"
@@ -23,7 +22,34 @@
                                :anchor "top center")
            :windowtype "dock"
            :exclusive true
-  "${time}" )
+  (box :class "sys_bat_box" :orientation "h" :space-evenly "false"
+      (circular-progress :value battery
+                :class "sys_bat"
+                :thickness 9
+            (label :text ""
+                :class "sys_icon_bat"
+                :limit-width 2
+                :show_truncated false
+                :wrap false))
+            (box :orientation "v" :space-evenly "false" :spacing 0 :hexpand "false" :vexpand "false"
+            (label :text "battery"
+                :halign "start"
+                :class "sys_text_bat"
+                :limit-width 9
+                :show_truncated false
+                :wrap false)
+            (label :text "${battery}%"
+                :halign "start"
+                :class "sys_text_bat_sub"
+                :limit-width 22
+                :show_truncated false
+                :wrap false)
+            (label :text "${battery_status}"
+                :halign "start"
+                :class "sys_text_bat_sub"
+                :limit-width 22
+                :show_truncated false
+                :wrap false))))
 
 
 (defwidget greeter [?text name]
