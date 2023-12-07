@@ -15,6 +15,17 @@ Plug 'petertriho/cmp-git'
 Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
 
+Plug 'elkowar/yuck.vim'
+Plug 'junegunn/vim-easy-align'
+Plug 'https://github.com/junegunn/vim-github-dashboard.git'
+Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+Plug 'preservim/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
+Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
+Plug 'fatih/vim-go', { 'tag': '*' }
+Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+
 " For luasnip users.
 " Plug 'L3MON4D3/LuaSnip'
 " Plug 'saadparwaiz1/cmp_luasnip'
