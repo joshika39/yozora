@@ -14,7 +14,7 @@
 
 (defwindow example_bar
            :class "example_bar"
-           :monitor 1
+           :monitor 0
            :geometry (geometry :x "0"
                                :y "6px"
                                :height "30px"
@@ -26,30 +26,31 @@
       (circular-progress :value battery
                 :class "sys_bat"
                 :thickness 9
-            (label :text ""
+            (label :text " |"
                 :class "sys_icon_bat"
                 :limit-width 2
                 :show_truncated false
                 :wrap false))
-            (box :orientation "v" :space-evenly "false" :spacing 0 :hexpand "false" :vexpand "false"
-            (label :text "battery"
+            (box :orientation "h" :space-evenly "false" :spacing 0 :hexpand "false" :vexpand "false"
+            (label :text "| "
                 :halign "start"
                 :class "sys_text_bat"
                 :limit-width 9
                 :show_truncated false
                 :wrap false)
-            (label :text "${battery}%"
+            (label :text "${battery}% | "
                 :halign "start"
                 :class "sys_text_bat_sub"
                 :limit-width 22
                 :show_truncated false
                 :wrap false)
-            (label :text "${battery_status}"
+            (label :text "${battery_status} | "
                 :halign "start"
                 :class "sys_text_bat_sub"
                 :limit-width 22
                 :show_truncated false
-                :wrap false))))
+                :wrap false)
+            (label :text "${time}"))))
 
 
 (defwidget greeter [?text name]
