@@ -16,12 +16,23 @@ print_pre_prompt ()
     printf "\e[0m%$(($COLUMNS))s" "${TIME}"
 }
 
+
+
 . ~/.config/yozora/git-completition.sh
 . ~/.config/yozora/git-prompt.sh
+
+if [ "`whoami`" = "root" ]; then
+    lpath="/root/bin"
+    User=$'\[\e[31;40m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]'
+else
+    lpath="/home/`whoami`/bin"
+    User=$'\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]'
+fi
+
 # \[$(tput sc; print_pre_prompt; tput rc)\]
 export PS1='
-╔═╦═══ [\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]] - (\[\e[39;1m\]\j\[\e[0m\]) - [\[\e[34m\]\w\e[1;33m`__git_ps1 " (%s)"`\e[0m\[\e[0m\]]
-╚═╩═ [$?] ¥ \[\e[0m\]'
+╔═╦═══ [${User@P}] - (\[\e[39;1m\]\j\[\e[0m\]) - [\[\e[34m\]\w\e[1;33m`__git_ps1 " (%s)"`\e[0m\[\e[0m\]]
+╚═╩═ [$?] *** \[\e[0m\]'
 
 # Display running command in GNU Screen window status
 #
@@ -37,3 +48,10 @@ export GPG_TTY=$(tty)
 # export GIT_PS1_SHOWDIRTYSTATE=1
 # export PS1='[\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h: \[\e[34m\]\W\e[1;33m$(__git_ps1 " (%s)")\e[0m\[\e[0m\]]\$ '
 # export PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
+
+export npm_config_prefix="$HOME/.local"
+export DOTNET_ROOT=$HOME/.dotnet
+
+PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$HOME/.local/bin:$lpath:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
+export PATH
+
