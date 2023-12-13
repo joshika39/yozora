@@ -7,7 +7,9 @@
 
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-
+rdp() {
+	xfreerdp "/size:${3:-1920x1080}" /p:$2 /u:$1 +clipboard /sound:sys:pulse /v:100.111.97.31:3389
+}
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 print_pre_prompt ()
@@ -54,4 +56,3 @@ export DOTNET_ROOT=$HOME/.dotnet
 
 PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$HOME/.local/bin:$lpath:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
 export PATH
-
