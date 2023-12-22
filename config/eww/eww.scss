@@ -1,20 +1,19 @@
-$background: #202E4B;
-$foreground: #fff;
+$background: #1D001A;
+$foreground: #FFC373;
 
-/* * {
+* {
   all: unset;
-} */
+} 
 
-
-.example_bar {
-  all: unset;
+.bar {
   background: $background;
   color: $foreground;
-  box-shadow: 0 2px 3px 2px #06060b;
-  border-radius: 5px;
-  min-height: 10px;
-  min-width: 70px;
-  margin: 50px;
-  // left: 50px;
-  padding: 50px;
+  padding: 10px;
+  margin: 15px;
 }
+
+.sidestuff {
+  margin-left: 55px;
+  padding-left: 50px;
+}
+
