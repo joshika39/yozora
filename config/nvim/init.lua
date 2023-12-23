@@ -1,12 +1,14 @@
-require('utils.globals')
-require('utils.functions')
+require('base')
+require('highlights')
+require('maps')
 
-require('config.yozora')
-require('config.options')
-require('config.lazy')
+local has = function(x) 
+  return vim.fn.has(x) == 1
+end
 
-require('lsp.config')
-require('lsp.setup')
-require('lsp.functions')
+local is_linux = has "unix"
 
-require('snippets.react')
+if is_linux then
+  require("linux")
+end
+
