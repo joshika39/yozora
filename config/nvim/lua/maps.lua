@@ -12,8 +12,12 @@ keymap.set('n', 'dw', 'vb"_d')
 -- Select all
 keymap.set('n', '<C-a>', 'gg<S-v>G')
 
--- New tab
+-- Tabs
 keymap.set('n', 'te', ':tabedit<Return>')
+vim.api.nvim_set_keymap('n', '<Tab>', '<cmd>BufferLineCycleNext<cr>', {})
+vim.api.nvim_set_keymap('n', '<S-Tab>', '<cmd>BufferLineCyclePrev<cr>', {})
+-- keymap.set('n', '<C-Left>', ':tabprevious<Return>')
+-- keymap.set('n', '<C-Right>', ':tabnext<Return>')
 
 keymap.set('n', 'ss', ':split<Return><C-w>w', { silent = true })
 keymap.set('n', 'sv', ':vsplit<Return><C-w>w', { silent = true })
