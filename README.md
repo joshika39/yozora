@@ -19,6 +19,8 @@ If you sourced the bashrc file with: `source ~/.bashrc` then you can use the fol
 update # This will update the base packages
 
 update <collection-name> # This will update the specified collection
+
+update --list # This will list all the available collections
 ```
 
 ### Notes
