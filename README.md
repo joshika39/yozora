@@ -21,6 +21,7 @@ update # This will update the base packages
 update <collection-name> # This will update the specified collection
 
 update --list # This will list all the available collections
+update --all # This will update all the collections
 ```
 
 ### Notes
