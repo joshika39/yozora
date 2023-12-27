@@ -14,6 +14,7 @@ fi
 #
 # -l or --list to list the available package collections
 # -h or --help to display the help message
+# -a or --all to install all the available package collections
 
 
 if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
@@ -29,6 +30,13 @@ if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
   exit 0
 fi
 
+if [ "$1" == "-a" ] || [ "$1" == "--all" ]; then
+  for package in $packages; do
+    sudo bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/$package.conf
+    bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/$package.conf
+  done
+  exit 0
+fi
 
 if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   echo "Usage: ./install.sh <package_collection>"
