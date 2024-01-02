@@ -4,3 +4,6 @@
 [submodule "config/eww"]
 	path = config/eww
 	url = git@github.com:joshika39/yozora-eww.git
+[submodule "config/hypr"]
+	path = config/hypr
+	url = git@github.com:joshika39/yozora-hyprland.git
