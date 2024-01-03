@@ -5,12 +5,65 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-alias ls='ls --color=auto'
-alias grep='grep --color=auto'
+
+HISTCONTROL=ignoredups:ignorespace
+shopt -s histappend
+HISTSIZE=200
+HISTFILESIZE=400
+shopt -s checkwinsize
+
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+unset color_prompt force_color_prompt
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null
+then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+else
+	color_prompt=
+fi
+
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+if [ -f ~/.bash_local ]; then
+    . ~/.bash_local
+fi
+
+umask 022
+
 rdp() {
 	xfreerdp "/size:${3:-1920x1080}" /p:$2 /u:$1 +clipboard /sound:sys:pulse /v:100.111.97.31:3389
 }
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Git completition
 
 . ~/.config/yozora/git-completition.sh
 . ~/.config/yozora/git-prompt.sh
@@ -33,7 +86,6 @@ case $TERM in screen*)
 esac
 
 export GPG_TTY=$(tty)
-
 export DOTNET_ROOT=$HOME/.dotnet
 
 PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$HOME/.local/bin:$lpath:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"

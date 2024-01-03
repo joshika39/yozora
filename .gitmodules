@@ -7,3 +7,6 @@
 [submodule "config/hypr"]
 	path = config/hypr
 	url = git@github.com:joshika39/yozora-hyprland.git
+[submodule "config/i3"]
+	path = config/i3
+	url = git@github.com:joshika39/yozora-i3.git
