@@ -18,6 +18,7 @@ if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
+unset npm_config_prefix
 unset color_prompt force_color_prompt
 
 # enable color support of ls and also add handy aliases
