@@ -32,41 +32,16 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
  unset f
 fi
 
-session=${1:-i3}
+startLoc=$HOME/.config/xinit.d	
+if [ -d ~/.config/xinit.d/ ] ; then
+	for f in ~/.config/xinit.d/?*.sh ; do
+	  [ -x "$f" ] && . "$f"
+	done
+	unset f
+fi
 
-case $session in
-	i3|i3wm	)
-		startLoc=$HOME/.config/xinit.d	
-		if [ -d ~/.config/xinit.d/ ] ; then
-			for f in ~/.config/xinit.d/?*.sh ; do
-				[ -x "$f" ] && . "$f"
-			done
-			unset f
-		fi
-
-		export POLYBAR_HOME="$HOME/.config/polybar/files"
-		export GTK_IM_MODULE=ibus
-		export QT_IM_MODULE=ibus
-		export XMODIFIERS=@im=ibus	
-		$HOME/.fehbg &
-		exec i3
-		;;
-
-	kde	)
-		export KDEWM=/usr/bin/i3
-		export GTK_IM_MODULE=ibus
-		export QT_IM_MODULE=ibus
-		export XMODIFIERS=@im=ibus
-		ibus-daemon -drx &
-	       	export DESKTOP_SESSION=plasma	
-		exec startplasma-x11;;
-	twm	)
-		twm &
-		# xclock -geometry 50x50-1+1 &
-		xterm -geometry 80x50+494+51 &
-		xterm -geometry 80x20+494-0 &
-		exec xterm -geometry 80x66+0+0 -name login
-		;;
-
-	*	) exec $1 ;;
-esac
+export GTK_IM_MODULE=ibus
+export QT_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus	
+export GLFW_IM_MODULE=ibus
+exec i3
