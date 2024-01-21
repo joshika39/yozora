@@ -10,3 +10,6 @@
 [submodule "config/i3"]
 	path = config/i3
 	url = git@github.com:joshika39/yozora-i3.git
+[submodule "config/kitty"]
+	path = config/kitty
+	url = git@github.com:joshika39/yozora-kitty.git
