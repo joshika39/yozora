@@ -5,7 +5,9 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+alias bye='sudo shutdown -h now'
 
+# don't put duplicate lines or lines starting with space in the history.
 HISTCONTROL=ignoredups:ignorespace
 shopt -s histappend
 HISTSIZE=200
