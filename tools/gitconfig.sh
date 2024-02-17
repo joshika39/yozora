@@ -4,7 +4,7 @@ source ./gpg.sh
 
 set_base() {
   gitfile="$1"
-  gitfile="${gitfile/#\~/$HOME}"
+  absolute_file="${gitfile/#\~/$HOME}"
   echo "Setting up gitconfig at $gitfile"
 
   echo "Enter your default git name: "
@@ -13,8 +13,8 @@ set_base() {
   echo "Enter your default git email: "
   read email
 
-  git config --file "$gitfile" user.name "$name"
-  git config --file "$gitfile" user.email "$email"
+  git config --file "$absolute_file" user.name "$name"
+  git config --file "$absolute_file" user.email "$email"
   
   check_gpg
   if [ "$?" == "1" ]; then
@@ -34,7 +34,7 @@ setup_sub_config() {
     read gitconfig_path
   fi
 
-  git config --global includeIf."$sub_path".path "$gitconfig_path"
+  git config --global includeIf."gitdir:$sub_path".path "$gitconfig_path"
   set_base "$gitconfig_path"
   return 0
 }
@@ -85,6 +85,6 @@ git config --global color.ui true
 git config --global alias.lg1 "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all"
 git config --global alias.lg2 "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'"
 git config --global alias.lg "lg1"
-
+git config --global alias.f "fetch -p --prune-tags --all"
 git config --global core.autocrlf input
 
