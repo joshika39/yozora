@@ -22,7 +22,7 @@ set_base() {
     return 1
   fi
 
-  set_git_gpg_signing "$gitfile"
+  set_git_gpg_signing "$absolute_file"
 }
 
 setup_sub_config() {
