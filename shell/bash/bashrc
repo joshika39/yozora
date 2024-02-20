@@ -18,6 +18,12 @@ if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
+# Git completition and prompt
+GIT_COMP=~/.config/yozora/tools/git-completion.sh
+GIT_PROMPT=~/.config/yozora/tools/git-prompt.sh
+[ -f $GIT_COMP ] && source $GIT_COMP
+[ -f $GIT_PROMPT ] && source $GIT_PROMPT
+
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
 [ -f ~/.bash_local ] && source ~/.bash_local
 [ -f ~/.bash_functions ] && source ~/.bash_functions
@@ -32,12 +38,6 @@ umask 022
 rdp() {
 	xfreerdp "/size:${3:-1920x1080}" /p:$2 /u:$1 +clipboard /sound:sys:pulse /v:100.111.97.31:3389
 }
-
-# Git completition and prompt
-GIT_COMP=~/.config/yozora/tools/git-completion.sh
-GIT_PROMPT=~/.config/yozora/tools/git-prompt.sh
-[ -f $GIT_COMP ] && source $GIT_COMP
-[ -f $GIT_PROMPT ] && source $GIT_PROMPT
 
 unset npm_config_prefix
 unset color_prompt force_color_prompt
