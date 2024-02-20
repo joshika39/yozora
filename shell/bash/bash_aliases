@@ -15,3 +15,4 @@ fi
 alias bye='sudo shutdown -h now'
 alias reboot='sudo shutdown -r now'
 alias refresh='source ~/.bashrc'
+alias e='exit'
