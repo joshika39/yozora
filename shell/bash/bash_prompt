@@ -23,8 +23,20 @@ case $TERM in screen*)
   PS1=${PS1}'\[\033k\033\\\]'
 esac
 
+GIT_PROMPT=~/.config/yozora/tools/git-prompt.sh
+[ -f $GIT_PROMPT ] && source $GIT_PROMPT
+
+get_git_branch() {
+  if [ -f $GIT_PROMPT ]; then
+    res=$(__git_ps1)
+    echo -n "$res"
+  else
+    echo -n "(no git file)"
+  fi
+}
+
 PS1=""
-PS1+="╔═╦═══ [\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]] - (\[\e[39;1m\]\j\[\e[0m\]) - [\[\e[34m\]\w\e[1;33m\$(__git_ps1 \" (%s)\")\e[0m\[\e[0m\]]"
+PS1+="╔═╦═══ [\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]] - (\[\e[39;1m\]\j\[\e[0m\]) - [\[\e[34m\]\w\e[1;33m\$(get_git_branch)\e[0m\[\e[0m\]]"
 PS1+="\n"
 PS1+="╚═╩═ *** \[\e[0m\]"
 

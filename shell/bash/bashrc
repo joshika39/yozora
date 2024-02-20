@@ -20,9 +20,7 @@ fi
 
 # Git completition and prompt
 GIT_COMP=~/.config/yozora/tools/git-completion.sh
-GIT_PROMPT=~/.config/yozora/tools/git-prompt.sh
 [ -f $GIT_COMP ] && source $GIT_COMP
-[ -f $GIT_PROMPT ] && source $GIT_PROMPT
 
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
 [ -f ~/.bash_local ] && source ~/.bash_local
