@@ -33,7 +33,7 @@ rdp() {
 	xfreerdp "/size:${3:-1920x1080}" /p:$2 /u:$1 +clipboard /sound:sys:pulse /v:100.111.97.31:3389
 }
 
-# Git completition
+# Git completition and prompt
 GIT_COMP=~/.config/yozora/tools/git-completion.sh
 GIT_PROMPT=~/.config/yozora/tools/git-prompt.sh
 [ -f $GIT_COMP ] && source $GIT_COMP
