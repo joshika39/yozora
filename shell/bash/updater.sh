@@ -6,7 +6,7 @@
 # the files are the: .bashrc, .bash_aliases, .bash_functions, .bash_profile, .bash_prompt, .bash_exports
 
 # The repository directory
-REPO_DIR=~/.config/yozora
+REPO_DIR=~/.config/yozora/shell/bash/
 
 # Exit if the repository directory does not exist
 if [ ! -d $REPO_DIR ]; then
@@ -67,3 +67,5 @@ if [ "$DOWNLOAD" == "true" ]; then
     done
     echo "The repository files have been downloaded to the local directory"
 fi
+
+source ~/.bashrc
