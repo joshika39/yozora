@@ -28,10 +28,11 @@ do
 		fi
 	fi
 done < $1
+
 echo " --> before aur"
 if (( $(id -u) != 0 )); then
 	echo
-	echo " --> AUR:"
+	echo " --> Installing AUR Packages <--"
 	if [[ ! -d $HOME/.aur-installs ]];then
 		mkdir $HOME/.aur-installs/	
 	fi
@@ -44,7 +45,7 @@ if (( $(id -u) != 0 )); then
 	
 	for pkg in ${AUR[@]}; do
 		if ! pacman -Qs ${pkg} > /dev/null; then  
-			echo "--> Installing: $pkg <<"
+			echo "\t--> Installing: $pkg"
 			echo 
 			cd $TEMP_DIR
 			git clone https://aur.archlinux.org/${pkg}.git
@@ -53,9 +54,8 @@ if (( $(id -u) != 0 )); then
 		fi
 	done
 else
-	echo "===> Setting up the Packages"
+	echo " --> Installing Official Packages <--"
 	echo
 
 	pacman -Sy --needed ${OFFICIAL}
-#	echo $OFFICIAL
 fi
