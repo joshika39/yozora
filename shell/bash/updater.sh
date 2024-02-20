@@ -6,7 +6,7 @@
 # the files are the: .bashrc, .bash_aliases, .bash_functions, .bash_profile, .bash_prompt, .bash_exports
 
 # The repository directory
-REPO_DIR=~/github/joshika39/yozora/shell/bash/
+REPO_DIR=~/.config/yozora
 
 # Exit if the repository directory does not exist
 if [ ! -d $REPO_DIR ]; then
