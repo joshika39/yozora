@@ -16,4 +16,9 @@ alias bye='sudo shutdown -h now'
 alias reboot='sudo shutdown -r now'
 alias refresh='source ~/.bashrc'
 alias e='exit'
-alias update='bash $YOZORA_PATH/install.sh'
+alias c='clear'
+alias h='history'
+alias ll='ls -l'
+
+# Example usage: `update` or `update <package_collection>`
+alias update='bash $YOZORA_PATH/install.sh $1'

@@ -17,11 +17,18 @@ if ! [ -z "$1" ]; then
     bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/$package_collection.conf
   else
     echo "The package collection $package_collection does not exist"
-    exit 1
-fi
+    # Store the available package collections, while removing the `.conf` extension
+    package_array=($(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g'))
+    # Rename the `base` to "(*) base" to indicate that it is the default package collection
+    packages=$(echo "${package_array[@]/base/(*)-base}")
 
-# install the necessary dependencies
+    echo "Available package collections:"
+    for package in $packages; do
+      echo -e "\t-> $package"
+    done
+    exit 1
+  fi
+fi
 
 sudo bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/base.conf
 bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/base.conf
-
