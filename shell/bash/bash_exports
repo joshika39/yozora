@@ -9,3 +9,5 @@ export DOTNET_ROOT=$HOME/.dotnet
 
 PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$HOME/.local/bin:$lpath:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
 export PATH
+
+export YOZORA_PATH=$HOME/.config/yozora
