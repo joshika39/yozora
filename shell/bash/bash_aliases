@@ -20,5 +20,10 @@ alias c='clear'
 alias h='history'
 alias ll='ls -l'
 
+dotnet_install() {
+  version=${1:-"latest"}
+  sudo bash $YOZORA_PATH/tools/dotnet-install.sh --install-dir /usr/share/dotnet -channel STS -version $version
+}
+
 # Example usage: `update` or `update <package_collection>`
 alias update='bash $YOZORA_PATH/install.sh $1'
