@@ -2,13 +2,16 @@
 
 generate_gpg () {
   if ! [ -z "$(gpg --list-secret-keys)" ]; then
-    read -p "GPG keys found. Do you want to generate a new one? (Y/n): " generate
+    read -p "GPG keys found. Do you want to generate a new one or list them or select an existing (Y/l/n): " generate
     if [ "$generate" == "n" ]; then
       return 1
+    elif [ "$generate" == "l" ]; then
+      gpg --list-secret-keys --keyid-format=long > /dev/tty
+      generate_gpg 
+    elif [ "$generate" == "Y" ]; then
+      gpg --full-generate-key
     fi
   fi
-
-  gpg --full-generate-key
 }
 
 check_gpg() {

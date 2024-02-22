@@ -7,16 +7,22 @@ set_base() {
   absolute_file="${gitfile/#\~/$HOME}"
   echo "Setting up gitconfig at $gitfile"
 
-  echo "Enter your default git name: "
-  read name
+  read -p "Enter your default git name: " name
+  if [ -z "$name" ]; then
+    echo "Skipping config: no name provided"
+  else
+    git config --file "$absolute_file" user.name "$name"
+  fi
 
-  echo "Enter your default git email: "
-  read email
+  read -p "Enter your default git email: " email
+  if [ -z "$email" ]; then
+    echo "Skipping config: no email provided"
+  else
+    git config --file "$absolute_file" user.email "$email"
+  fi
 
-  git config --file "$absolute_file" user.name "$name"
-  git config --file "$absolute_file" user.email "$email"
-  
   check_gpg
+
   if [ "$?" == "1" ]; then
     echo "No GPG keys found. Not setting up GPG signing."
     return 1
