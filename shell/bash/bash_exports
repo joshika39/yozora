@@ -11,3 +11,8 @@ PATH="$DOTNET_ROOT:/usr/share/dotnet:$DOTNET_ROOT/tools:$HOME/.local/bin:$lpath:
 export PATH
 
 export YOZORA_PATH=$HOME/.config/yozora
+
+export GTK_IM_MODULE='ibus'
+export QT_IM_MODULE='ibus'
+export XMODIFIERS=@im='ibus'
+export GLFW_IM_MODULE=ibus
