@@ -30,5 +30,11 @@ if ! [ -z "$1" ]; then
   fi
 fi
 
-sudo bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/base.conf
-bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/base.conf
+# Install the base package collection if no package collection is specified
+
+if [ -z "$1" ]; then
+  sudo bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/base.conf
+  bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/base.conf
+fi
+
+
