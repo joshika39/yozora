@@ -3,6 +3,7 @@
 AUR=()
 OFFICIAL=()
 COMMANDS=()
+SUDO_COMMANDS=()
 sep="->"
 while read PKG
 do
@@ -21,6 +22,11 @@ do
   			split="${PKG#*$sep}"
 			COMMANDS+=( "${split}" )
 		fi
+
+    if [[ ${PKG::1} == "s" ]]; then 
+  			split="${PKG#*$sep}"
+      SUDO_COMMANDS+=( "${split}" )
+    fi
 		
 		if [[ ${PKG::1} == "a" ]]; then 
   			 split="${PKG#*$sep}"
@@ -53,9 +59,17 @@ if (( $(id -u) != 0 )); then
 			sudo rm -r $TEMP_DIR/*
 		fi
 	done
-else
-	echo " --> Installing Official Packages <--"
-	echo
+fi
 
-	pacman -Sy --needed ${OFFICIAL}
+if (( $(id -u) == 0 )); then
+  echo
+  echo " --> Installing Official Packages <--"
+  for pkg in ${OFFICIAL[@]}; do
+      pacman -S $pkg --noconfirm
+  done
+
+  echo " Running sudo commands"
+  for ((i = 0; i < ${#SUDO_COMMANDS[@]}; i++)); do
+    eval ${SUDO_COMMANDS[$i]}
+  done
 fi
