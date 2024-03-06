@@ -18,10 +18,27 @@ fi
 
 # Check if the user has other yozora supported packages installed (yozora-i3, yozora-hyprland)
 
-declare -A componentsHealthStatusDictionary=(
+declare -A components_health_status=(
   ["i3"]="unhealthy"
   ["hyprland"]="unhealthy"
 )
+
+is_directory() {
+  local path=$1
+  local component=$2
+
+  if ! [ -z "$component" ]; then
+    path="$HOME/.config/$component/pkgs/$path"
+  else
+    path="$YOZORA_PATH/pkg-collections/$path"
+  fi
+
+  if [ -d "$path" ]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
 
 list_component_packages() {
   local component=$1
@@ -29,36 +46,76 @@ list_component_packages() {
   local packages=$(ls $component_path/pkgs | sed 's/\.conf//g')
   package_array=(${package_array[@]/base/})
 
-  echo "Available package collections for the $component component:"
   for package in $packages; do
-    echo -e "\t-> $package"
+    echo -e "\t-> $package ($component)"
   done
 }
 
-for component in "${!componentsHealthStatusDictionary[@]}"; do
+# TODO: Add support for same named packages in different components
+get_component_by_package() {
+  local package="$1"
+
+  for component in "${!components_health_status[@]}"; do
+    local component_path="$HOME/.config/$component/pkgs"
+    if [ -d "$component_path" ]; then
+      if [ -f "$component_path/$package.conf" ]; then
+        echo "$component"
+        return 0
+      fi
+    fi
+  done
+  return 1
+}
+
+install_package() {
+  local package=$1
+  local install_script="$YOZORA_PATH/tools/install-packages.sh"
+
+  component=$(get_component_by_package $package)
+  if ! [ -z $component ]; then
+    echo "Component found: $component"
+    folder="$HOME/.config/$component/pkgs"
+  else
+    folder="$YOZORA_PATH/pkg-collections"
+  fi
+
+  if ! [ -f "$folder/$package.conf" ]; then
+    echo "The package: $package does not exist"
+    return 1
+  fi
+
+  bash "$install_script" --path "$folder" --package "$package.conf"
+  sudo bash "$install_script" --path "$folder" --package "$package.conf"
+}
+
+for component in "${!components_health_status[@]}"; do
   echo "Searching for the $component component in: $HOME/.config/$component"
   if [ -d "$HOME/.config/$component" ] && [ -f "$HOME/.config/$component/healthcheck.sh" ]; then
     response=$(bash "$HOME/.config/$component/healthcheck.sh")
-    componentsHealthStatusDictionary[$component]=$response
-    echo "-> The $component component is ${componentsHealthStatusDictionary[$component]}"
+    components_health_status[$component]=$response
+    echo "-> The $component component is ${components_health_status[$component]}"
   else
     echo "-> The $component component is not installed"
   fi
 done
 
-if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
-  package_array=($(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g'))
-
-  # Remove the `base` package collection from the list
-  package_array=(${package_array[@]/base/})
-
+list_packages() {
+  packages=$(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g')
+  
   echo "Available package collections:"
   for package in $packages; do
+    if [ $(is_directory $package) == "true" ]; then
+      continue
+    fi
     echo -e "\t-> $package"
   done
+}
 
-  for component in "${!componentsHealthStatusDictionary[@]}"; do
-    if [ "${componentsHealthStatusDictionary[$component]}" == "healthy" ]; then
+if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
+  list_packages
+
+  for component in "${!components_health_status[@]}"; do
+    if [ "${components_health_status[$component]}" == "healthy" ]; then
       list_component_packages $component
     fi
   done
@@ -66,9 +123,12 @@ if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
 fi
 
 if [ "$1" == "-a" ] || [ "$1" == "--all" ]; then
+  packages=$(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g')  
   for package in $packages; do
-    sudo bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/$package.conf
-    bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/$package.conf
+    if [ $(is_directory $package) == "true" ]; then
+      continue
+    fi
+    install_package "$YOZORA_PATH/pkg-collections/$package.conf"
   done
   exit 0
 fi
@@ -83,31 +143,16 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
 fi
 
 if ! [ -z "$1" ]; then
-  package_collection=$1
-
-  if [ -f "$YOZORA_PATH/pkg-collections/$package_collection.conf" ]; then
-    sudo bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/$package_collection.conf
-    bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/$package_collection.conf
-  else
-    echo "The package collection $package_collection does not exist"
-    # Store the available package collections, while removing the `.conf` extension
-    package_array=($(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g'))
-    # Remove the `base` package collection from the list
-    package_array=(${package_array[@]/base/})
-
-    echo "Available package collections:"
-    for package in $packages; do
-      echo -e "\t-> $package"
-    done
-    exit 1
-  fi
+    install_package $1
+    if [ $? -eq 0 ]; then
+      echo "The package: $1 has been installed successfully"
+    else
+      echo "The package: $1 could not be installed"
+    fi
 fi
 
-# Install the base package collection if no package collection is specified
-
 if [ -z "$1" ]; then
-  sudo bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/base.conf
-  bash $YOZORA_PATH/tools/install-packages.sh $YOZORA_PATH/pkg-collections/base.conf
+  install_package "base"
 fi
 
 
