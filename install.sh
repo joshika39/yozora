@@ -1,4 +1,4 @@
-#!/usr/env/bin bash
+#!/bin/bash
 
 # This script is used to install the necessary dependencies for the project
 
@@ -16,16 +16,51 @@ fi
 # -h or --help to display the help message
 # -a or --all to install all the available package collections
 
+# Check if the user has other yozora supported packages installed (yozora-i3, yozora-hyprland)
+
+declare -A componentsHealthStatusDictionary=(
+  ["i3"]="unhealthy"
+  ["hyprland"]="unhealthy"
+)
+
+list_component_packages() {
+  local component=$1
+  local component_path=$HOME/.config/$component
+  local packages=$(ls $component_path/pkgs | sed 's/\.conf//g')
+  package_array=(${package_array[@]/base/})
+
+  echo "Available package collections for the $component component:"
+  for package in $packages; do
+    echo -e "\t-> $package"
+  done
+}
+
+for component in "${!componentsHealthStatusDictionary[@]}"; do
+  echo "Searching for the $component component in: $HOME/.config/$component"
+  if [ -d "$HOME/.config/$component" ] && [ -f "$HOME/.config/$component/healthcheck.sh" ]; then
+    response=$(bash "$HOME/.config/$component/healthcheck.sh")
+    componentsHealthStatusDictionary[$component]=$response
+    echo "-> The $component component is ${componentsHealthStatusDictionary[$component]}"
+  else
+    echo "-> The $component component is not installed"
+  fi
+done
 
 if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
-  # Store the available package collections, while removing the `.conf` extension
   package_array=($(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g'))
+
   # Remove the `base` package collection from the list
   package_array=(${package_array[@]/base/})
 
   echo "Available package collections:"
   for package in $packages; do
     echo -e "\t-> $package"
+  done
+
+  for component in "${!componentsHealthStatusDictionary[@]}"; do
+    if [ "${componentsHealthStatusDictionary[$component]}" == "healthy" ]; then
+      list_component_packages $component
+    fi
   done
   exit 0
 fi
