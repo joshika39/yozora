@@ -7,7 +7,6 @@
 # `a` is used to install an AUR package
 # `i` is used to import another configuration file
 # The `->` is used to split the command from the package name
-#
 
 AUR=()
 OFFICIAL=()
@@ -16,7 +15,45 @@ SUDO_COMMANDS=()
 IMPORTS=()
 sep="->"
 
-# Read the file and take the imports first
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    "-p"|"--path")
+      root_path="$2"
+      shift
+      shift
+      ;;
+    "-pkg"|"--package")
+      package_collection="$2"
+      shift
+      shift
+      ;;
+    "-h"|"--help")
+      echo "Usage: ./install-packages.sh <package_collection>"
+      echo "or if the bashrc is sourced then: update <package_collection>"
+      echo ""
+      echo "--help, -h to display the help message"
+      echo "--path, -p to set the YOZORA_PATH"
+      echo "--package, -pkg to set the package collection"
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
+
+if [[ -z $root_path ]]; then
+  if [[ -d $YOZORA_PATH/pkg-collections ]]; then
+    root_path="$YOZORA_PATH/pkg-collections"
+  else
+    exit 1
+  fi
+fi
+
+full_path="$root_path/$package_collection"
 
 while read PKG; do
   if [[ ${PKG::1} != "#" && ${PKG::1} != "" ]]; then
@@ -25,28 +62,21 @@ while read PKG; do
       IMPORTS+=( "${split}" )
     fi
   fi
-done < $1
-
-# Combine the files into a temporary install file
+done < $full_path
 
 TEMP_FILE=$(mktemp)
 
-# If the pkg-collections directory is not found, then exit
-
-if [[ ! -d $YOZORA_PATH/pkg-collections ]]; then
-  echo "The pkg-collections directory was not found"
-  exit 1
-fi
-
 if [[ ${#IMPORTS[@]} -gt 0 ]]; then
   for file in ${IMPORTS[@]}; do
-    file="${YOZORA_PATH}/pkg-collections/$file"
+    file="$root_path/$file"
     cat $file >> $TEMP_FILE
   done
-  # Finally add the original file to the end of the temp file but remove the import lines (which start with `i`)
-  cat $1 | grep -v "^i" >> $TEMP_FILE
-  # Now we can use the temp file as the main file
+  echo cat $full_path | grep -v "^i"
+  cat $full_path | grep -v "^i" >> $TEMP_FILE
+else
+  cat $full_path > $TEMP_FILE
 fi
+
 
 while read PKG;
 do
@@ -78,43 +108,57 @@ do
 	fi
 done < $TEMP_FILE
 
-echo " --> before aur"
 if (( $(id -u) != 0 )); then
 	echo
-	echo " --> Installing AUR Packages <--"
-	if [[ ! -d $HOME/.aur-installs ]];then
-		mkdir $HOME/.aur-installs/	
-	fi
-	TEMP_DIR=$HOME/.aur-installs
-	CURRENT_DIR=$(pwd)
-	for ((i = 0; i < ${#COMMANDS[@]}; i++))
-	do
-		eval ${COMMANDS[$i]}
-	done
-	
-	for pkg in ${AUR[@]}; do
-    # If the package is not installed or the version is different
-    if [[ ! $(pacman -Q $pkg) ]]; then
-      echo "Installing $pkg"
-      cd $TEMP_DIR
-      git clone https://aur.archlinux.org/$pkg.git
-      cd $pkg
-      makepkg -si --noconfirm
-      cd $CURRENT_DIR
-    else
-      echo "$pkg is already installed with version: $(pacman -Q $pkg)"
+  if [[ ${#AUR[@]} -eq 0 ]]; then
+    echo "No AUR packages to install"
+  else
+    echo " --> Installing AUR Packages <--"
+    if [[ ! -d $HOME/.aur-installs ]]; then
+      mkdir $HOME/.aur-installs/	
     fi
-	done
+    TEMP_DIR=$HOME/.aur-installs
+    CURRENT_DIR=$(pwd)
+    for ((i = 0; i < ${#COMMANDS[@]}; i++)); do
+      eval ${COMMANDS[$i]}
+    done
+    
+    for pkg in ${AUR[@]}; do
+      # If the package is not installed or the version is different
+      if [[ ! $(pacman -Q $pkg) ]]; then
+        echo "Installing $pkg"
+        cd $TEMP_DIR
+        git clone https://aur.archlinux.org/$pkg.git
+        cd $pkg
+        makepkg -si --noconfirm
+        cd $CURRENT_DIR
+      else
+        echo "$pkg is already installed with version: $(pacman -Q $pkg)"
+      fi
+    done
+  fi
 fi
 
 if (( $(id -u) == 0 )); then
   echo
-  echo " --> Installing Official Packages <--"
-  PKGS=$(IFS=" "; echo "${OFFICIAL[*]}")
-  echo "Installing: $PKGS"
-  pacman -S --noconfirm $PKGS
-  echo " Running sudo commands"
-  for ((i = 0; i < ${#SUDO_COMMANDS[@]}; i++)); do
-    eval ${SUDO_COMMANDS[$i]}
-  done
+  if [[ ${#OFFICIAL[@]} -eq 0 ]]; then
+    echo "No official packages to install"
+  else
+    echo " --> Installing Official Packages <--"
+    official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
+    echo "Installing: $official_packages"
+    pacman -S --noconfirm $official_packages
+  fi
+  if [[ ${SUDO_COMMANDS[@]} -eq 0 ]]; then
+    echo "No sudo commands to execute"
+  else
+    echo " --> Executing sudo commands <--"
+    for ((i = 0; i < ${#SUDO_COMMANDS[@]}; i++)); do
+      eval ${SUDO_COMMANDS[$i]}
+    done
+  fi
 fi
+
+echo " --> Cleaning up <--"
+rm $TEMP_FILE
+echo " --> Done <--"
