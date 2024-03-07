@@ -147,6 +147,7 @@ if (( $(id -u) == 0 )); then
     echo " --> Installing Official Packages <--"
     official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
     echo "Installing: $official_packages"
+    pacman -Syu --noconfirm
     pacman -S $official_packages
   fi
   if [[ ${#SUDO_COMMANDS[@]} -eq 0 ]]; then
