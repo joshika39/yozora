@@ -44,5 +44,19 @@ export GTK_IM_MODULE=ibus
 export QT_IM_MODULE=ibus
 export XMODIFIERS=@im=ibus
 export GLFW_IM_MODULE=ibus
-$HOME/.fehbg &
-exec i3
+
+# start the window manager which is i3 by default but can be changed by passing a different window manager as an argument like kde or gnome
+
+# every window manager has a different syntax to start it decide this switch case checks which window manager to start
+case $1 in
+    kde)
+        export DESKTOP_SESSION=plasma 
+        exec startplasma-x11
+        ;;
+    gnome)
+        exec gnome-session
+        ;;
+    *)
+        exec i3
+        ;;
+esac
