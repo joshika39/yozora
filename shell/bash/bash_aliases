@@ -19,6 +19,7 @@ alias e='exit'
 alias c='clear'
 alias h='history'
 alias ll='ls -l'
+alias start='startx ~/.xinitrc $1'
 
 dotnet_install() {
   version=${1:-"latest"}
