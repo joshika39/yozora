@@ -7,7 +7,10 @@ export LS_COLORS
 export GPG_TTY=$(tty)
 export DOTNET_ROOT=/usr/share/dotnet
 
-PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:$HOME/.local/bin:$lpath:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
+PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:$lpath:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
+PATH="$HOME/.cargo/bin:$PATH"
+PATH="$HOME/.local/bin:$PATH"
+PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH
 
 export YOZORA_PATH=$HOME/.config/yozora
