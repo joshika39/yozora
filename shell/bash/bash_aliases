@@ -23,7 +23,17 @@ alias start='startx ~/.xinitrc $1'
 
 dotnet_install() {
   version=${1:-"latest"}
-  sudo bash $YOZORA_PATH/tools/dotnet-install.sh --install-dir /usr/share/dotnet -channel STS -version $version
+  type=${2:-"channel"}
+
+  if [[ $type == "channel" ]]; then
+    type="channel LTS"
+  fi 
+
+  if [[ $type == "runtime" ]]; then
+    type="runtime dotnet"
+  fi
+
+  sudo bash $YOZORA_PATH/tools/dotnet-install.sh --install-dir /usr/share/dotnet -$type -version $version
 }
 
 # Example usage: `update` or `update <package_collection>`
