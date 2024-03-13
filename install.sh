@@ -21,6 +21,7 @@ fi
 declare -A components_health_status=(
   ["i3"]="unhealthy"
   ["hyprland"]="unhealthy"
+  ["polybar"]="unhealthy"
 )
 
 is_directory() {
