@@ -6,7 +6,7 @@ battery() {
   if [[ -f /sys/class/power_supply/${BAT}/capacity ]]; then
     cat /sys/class/power_supply/${BAT}/capacity
   else
-    echo ""
+    echo "PC"
   fi
 }
 battery_stat() {
@@ -15,7 +15,7 @@ battery_stat() {
   if [[ -f /sys/class/power_supply/${BAT}/capacity ]]; then
     cat /sys/class/power_supply/${BAT}/status
   else
-    echo ""
+    echo "PC"
   fi
 }
 
