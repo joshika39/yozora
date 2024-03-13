@@ -12,8 +12,7 @@ AUR=()
 OFFICIAL=()
 COMMANDS=()
 SUDO_COMMANDS=()
-IMPORTS=()
-sep="->"
+IMPORTS=() sep="->"
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -109,7 +108,15 @@ do
 done < $TEMP_FILE
 
 if (( $(id -u) != 0 )); then
-	echo
+
+  if [[ ${#COMMANDS[@]} -eq 0 ]]; then
+    echo "No sudo commands to execute"
+  else
+    echo " --> Executing commands <--"
+    for ((i = 0; i < ${#COMMANDS[@]}; i++)); do
+      eval ${COMMANDS[$i]}
+    done
+  fi
   if [[ ${#AUR[@]} -eq 0 ]]; then
     echo "No AUR packages to install"
   else
@@ -130,7 +137,7 @@ if (( $(id -u) != 0 )); then
         cd $TEMP_DIR
         git clone https://aur.archlinux.org/$pkg.git
         cd $pkg
-        makepkg -si --noconfirm
+        makepkg -si
         cd $CURRENT_DIR
       else
         echo "$pkg is already installed with version: $(pacman -Q $pkg)"
@@ -147,7 +154,7 @@ if (( $(id -u) == 0 )); then
     echo " --> Installing Official Packages <--"
     official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
     echo "Installing: $official_packages"
-    pacman -Syu --noconfirm
+    pacman -Syu
     pacman -S $official_packages
   fi
   if [[ ${#SUDO_COMMANDS[@]} -eq 0 ]]; then
