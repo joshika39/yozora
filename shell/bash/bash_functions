@@ -12,7 +12,6 @@ install_krew() {
   )
 }
 
-
 dotnet_install() {
   version=${1:-"latest"}
   type=${2:-"channel"}
@@ -33,3 +32,24 @@ brc() {
   operation=${1:-"download"}
   bash $YOZORA_PATH/shell/bash/updater.sh --$operation
 }
+
+# Custom git clone function
+gclone() {
+  repo=$1
+  user=${2:-"joshika39"}
+  host=${3:-"github.com"}
+  is_ssh=${4:-"true"}
+
+  if [[ -z $repo ]]; then
+    echo "No repository specified"
+    echo "usage: gclone <repo> [user] [host] [is_ssh]"
+    return 1
+  fi
+  
+  if [[ $is_ssh == "true" ]]; then
+    git clone git@$host:$user/$repo.git
+  else
+    git clone https://$host/$user/$repo.git
+  fi
+}
+
