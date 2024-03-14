@@ -27,10 +27,10 @@ downlaod_files() {
     if [ -f $full_path/${file#.} ]; then
       cp $full_path/${file#.} $LOCAL_DIR$file
     else
-      echo "The file does not exist: $full_path/${file#.}"
+      echo "-/> The file does not exist: $full_path/${file#.}"
     fi
   done
-  echo "The files have been downloaded to the local directory: $LOCAL_DIR from the repository: $full_path"
+  echo "--> The files have been downloaded to the local directory: $LOCAL_DIR from the repository: $full_path"
 }
 
 upload_files() {
@@ -47,10 +47,10 @@ upload_files() {
     if [ -f $LOCAL_DIR$file ]; then
       cp $LOCAL_DIR$file $full_path/${file#.}
     else
-      echo "The file does not exist: $LOCAL_DIR$file"
+      echo "-/> The file does not exist: $LOCAL_DIR$file"
     fi
   done
-  echo "The files have been uploaded to the repository: $REPO_DIR"
+  echo "--> The files have been uploaded to the repository: $REPO_DIR"
 }
 
 FILES=".bashrc .bash_aliases .bash_functions .bash_profile .bash_prompt .bash_exports"
@@ -76,5 +76,6 @@ fi
 if [ "$DOWNLOAD" == "true" ]; then
   downlaod_files "$FILES"
   downlaod_files "$HOME_FILES" "home"
+  echo "--> Run the command: 'refresh' to apply the changes in the current shell session."
 fi
 
