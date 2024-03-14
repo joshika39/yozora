@@ -34,11 +34,37 @@ brc() {
 }
 
 # Custom git clone function
+# use with --user <user> --host <host> --is_ssh <is_ssh> --target_dir <target_dir>
 gclone() {
-  repo=$1
-  user=${2:-"$(whoami)"}
-  host=${3:-"github.com"}
-  is_ssh=${4:-"true"}
+  # Parse the arguments in switch case
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      "--user"|"-u")
+        user=${2:-"$(whoami)"}
+        shift
+        shift
+        ;;
+      "--host"|"-h")
+        host=${2:-"github.com"}
+        shift
+        shift
+        ;;
+      "--is_ssh")
+        is_ssh=${2:-"true"}
+        shift
+        shift
+        ;;
+      "--target_dir"|"-t")
+        target_dir=${2:-""}
+        shift
+        shift
+        ;;
+      *)
+        repo=$1
+        shift
+        ;;
+    esac
+  done
 
   if [[ -z $user ]]; then
     echo "No user or global user specified"
@@ -53,9 +79,9 @@ gclone() {
   fi
   
   if [[ $is_ssh == "true" ]]; then
-    git clone git@$host:$user/$repo.git
+    git clone git@$host:$user/$repo.git $target_dir
   else
-    git clone https://$host/$user/$repo.git
+    git clone https://$host/$user/$repo.git $target_dir
   fi
 }
 
