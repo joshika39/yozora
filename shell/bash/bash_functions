@@ -35,9 +35,8 @@ brc() {
 
 # Custom git clone function
 gclone() {
-  current_user=$(git config --global user.name)
   repo=$1
-  user=${2:-"$current_user"}
+  user=${2:-"$(whoami)"}
   host=${3:-"github.com"}
   is_ssh=${4:-"true"}
 
