@@ -29,7 +29,7 @@ dotnet_install() {
 }
 
 # Download the bashrc components from the yozora repository
-bashrc() {
+brc() {
   operation=${1:-"download"}
   bash $YOZORA_PATH/shell/bash/updater.sh --$operation
 }
