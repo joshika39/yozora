@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Bash functions
-
-
 install_krew() {
   (
     set -x; cd "$(mktemp -d)" &&
@@ -13,4 +10,26 @@ install_krew() {
     tar zxvf "${KREW}.tar.gz" &&
     ./"${KREW}" install krew
   )
+}
+
+
+dotnet_install() {
+  version=${1:-"latest"}
+  type=${2:-"channel"}
+
+  if [[ $type == "channel" ]]; then
+    type="channel LTS"
+  fi 
+
+  if [[ $type == "runtime" ]]; then
+    type="runtime dotnet"
+  fi
+
+  sudo bash $YOZORA_PATH/tools/dotnet-install.sh --install-dir /usr/share/dotnet -$type -version $version
+}
+
+# Download the bashrc components from the yozora repository
+bashrc() {
+  operation=${1:-"download"}
+  bash $YOZORA_PATH/shell/bash/updater.sh --$operation
 }
