@@ -24,6 +24,17 @@ update --list # This will list all the available collections
 update --all # This will update all the collections
 ```
 
+### Bashrc file updater
+You can use the following command to update the bashrc and the other bashrc related files (bash_aliases, bash_functions, bash_exports, bash_profile, bash_prompt, bashrc, bashrc.d):
+
+```bash
+brc # This will update the bashrc file from the repository
+refresh # This will refresh (source) the bashrc file
+
+brc --upload # This will upload the local bashrc file to the repository
+
+```
+
 ### Notes
 
 Add switchable work environment: wayland to xorg
