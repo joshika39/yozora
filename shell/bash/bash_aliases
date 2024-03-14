@@ -19,6 +19,10 @@ alias e='exit'
 alias c='clear'
 alias h='history'
 alias ll='ls -l'
+alias home='~'
+alias path='echo -e ${PATH//:/\\n}'
+alias now='date +"%T"'
+alias n='nvim'
 alias start='startx ~/.xinitrc $1'
 
 dotnet_install() {
@@ -35,6 +39,10 @@ dotnet_install() {
 
   sudo bash $YOZORA_PATH/tools/dotnet-install.sh --install-dir /usr/share/dotnet -$type -version $version
 }
+# Directory navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
 
 # Example usage: `update` or `update <package_collection>`
 alias update='bash $YOZORA_PATH/install.sh $1'
