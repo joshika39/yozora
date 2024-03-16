@@ -190,31 +190,37 @@ install_all() {
   done
 }
 
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    -l|--list)
+      list
+      exit 0
+      ;;
+    -h|--help)
+      help
+      exit 0
+      ;;
+    -a|--all)
+      install_all
+      exit 0
+      ;;
+    -c|--component)
+      component=$2
+      shift
+      shift
+      ;;
+    -p|--package)
+      package=$2
+      shift
+      shift
+      ;;
+    *)
+      package=$1
+      shift
+  esac
+done
 # Process the arguments in switch case
-switch $1 in
-  -l|--list)
-    list
-    exit 0
-    ;;
-  -h|--help)
-    help
-    exit 0
-    ;;
-  -a|--all)
-    install_all
-    exit 0
-    ;;
-  -c|--component)
-    component=$2
-    shift
-    ;;
-  -p|--package)
-    package=$2
-    shift
-    ;;
-  *)
-    package=$1
-esac
 
 if ! [ -z "$package" ]; then
   if ! [ -z "$component" ]; then
