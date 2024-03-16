@@ -141,7 +141,16 @@ is_unique_named_package() {
   return 0
 }
 
-if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
+help() {
+  echo "Usage: ./install.sh <package_collection>"
+  echo "or if the bashrc is sourced then: 'update <package_collection>'"
+  echo ""
+  echo "-l or --list to list the available package collections"
+  echo "-h or --help to display the help message"
+  echo "-a or --all to install all the available package collections"
+}
+
+list() {
   check_component_health
 
   list_packages
@@ -151,10 +160,9 @@ if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
       list_component_packages $component
     fi
   done
-  exit 0
-fi
+}
 
-if [ "$1" == "-a" ] || [ "$1" == "--all" ]; then
+install_all() {
   packages=$(ls $YOZORA_PATH/pkg-collections | sed 's/\.conf//g')  
   for package in $packages; do
     if [ $(is_directory $package) == "true" ]; then
@@ -162,17 +170,33 @@ if [ "$1" == "-a" ] || [ "$1" == "--all" ]; then
     fi
     install_package "$YOZORA_PATH/pkg-collections/$package.conf"
   done
-  exit 0
-fi
+}
 
-if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
-  echo "Usage: ./install.sh <package_collection>"
-  echo "or if the bashrc is sourced then: update <package_collection>"
-  echo ""
-  echo "--list, -l to list the available package collections"
-  echo "--help, -h to display the help message"
-  exit 0
-fi
+# Process the arguments in switch case
+switch $1 in
+  -l|--list)
+    list
+    exit 0
+    ;;
+  -h|--help)
+    help
+    exit 0
+    ;;
+  -a|--all)
+    install_all
+    exit 0
+    ;;
+  -c|--component)
+    component=$2
+    shift
+    ;;
+  -p|--package)
+    package=$2
+    shift
+    ;;
+  *)
+    package=$1
+esac
 
 if ! [ -z "$1" ]; then
     install_package $1
