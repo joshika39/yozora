@@ -122,7 +122,7 @@ list_packages() {
   done
 }
 
-has_same_named_package() {
+is_unique_named_package() {
   local package=$1
   
   for a_component in "${!components_health_status[@]}"; do
@@ -131,14 +131,14 @@ has_same_named_package() {
         continue
       fi
       if [ -f "$HOME/.config/$a_component/pkgs/$package.conf" ] && [ -f "$HOME/.config/$b_component/pkgs/$package.conf" ]; then
-        echo "true"
+        echo "false"
         return 0
       fi
     done
   done
 
-  echo "false"
-  return 1
+  echo "true"
+  return 0
 }
 
 if [ "$1" == "-l" ] || [ "$1" == "--list" ]; then
