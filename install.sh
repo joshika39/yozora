@@ -75,6 +75,22 @@ get_component_by_package() {
   return 1
 }
 
+get_multiple_components_by_package() {
+  local package="$1"
+  local components=()
+
+  for component in "${!components_health_status[@]}"; do
+    local component_path="$HOME/.config/$component/pkgs"
+    if [ -d "$component_path" ]; then
+      if [ -f "$component_path/$package.conf" ]; then
+        components+=($component)
+      fi
+    fi
+  done
+
+  echo "${components[@]}"
+}
+
 install_package() {
   local package=$1
   local component=$2
