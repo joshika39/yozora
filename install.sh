@@ -143,7 +143,7 @@ is_unique_named_package() {
   
   for a_component in "${!components_health_status[@]}"; do
     for b_component in "${!components_health_status[@]}"; do
-      if [ $a_component == $b_component ]; then
+      if [[ $a_component == $b_component ]]; then
         continue
       fi
       if [ -f "$HOME/.config/$a_component/pkgs/$package.conf" ] && [ -f "$HOME/.config/$b_component/pkgs/$package.conf" ]; then
@@ -164,6 +164,8 @@ help() {
   echo "-l or --list to list the available package collections"
   echo "-h or --help to display the help message"
   echo "-a or --all to install all the available package collections"
+  echo "-c or --component to specify the component"
+  echo "-p or --package to specify the package"
 }
 
 list() {
