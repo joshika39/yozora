@@ -198,8 +198,18 @@ switch $1 in
     package=$1
 esac
 
-if ! [ -z "$1" ]; then
-    install_package $1
+if ! [ -z "$package" ]; then
+  if ! [ -z "$component" ]; then
+    install_package $package $component
+  else
+    unique_package=$(has_same_named_package $package)
+    if [ $unique_package == "true" ]; then
+      component=$(get_component_by_package $package)
+      install_package $package $component
+    else
+      echo "The package: $package is found in multiple components. Please specify the component with the -c flag"
+    fi
+
     if [ $? -eq 0 ]; then
       echo "The package: $1 has been installed successfully"
     else
