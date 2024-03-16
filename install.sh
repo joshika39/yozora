@@ -224,25 +224,29 @@ done
 
 if ! [ -z "$package" ]; then
   if ! [ -z "$component" ]; then
+    echo "Component specified: $component and package: $package"
     install_package $package $component
   else
-    unique_package=$(has_same_named_package $package)
-    if [ $unique_package == "true" ]; then
+    unique_package=$(is_unique_named_package $package)
+    if [[ $unique_package == "true" ]]; then
       component=$(get_component_by_package $package)
       install_package $package $component
+      if [ $? -eq 0 ]; then
+        echo "The package: $package has been installed successfully"
+      else
+        echo "The package: $package could not be installed"
+      fi
     else
+      components=$(get_multiple_components_by_package $package)
       echo "The package: $package is found in multiple components. Please specify the component with the -c flag"
+      echo "The package: $package is found in the following components: ${components[@]}"
+      echo "Usage: update -c <component> -p $package"
+      exit 1
     fi
-
-    if [ $? -eq 0 ]; then
-      echo "The package: $1 has been installed successfully"
-    else
-      echo "The package: $1 could not be installed"
-    fi
+  fi
 fi
 
-if [ -z "$1" ]; then
+if [ -z "$package" ]; then
   install_package "base"
 fi
-
 
