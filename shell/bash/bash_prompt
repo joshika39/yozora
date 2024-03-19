@@ -23,7 +23,7 @@ case $TERM in screen*)
   PS1=${PS1}'\[\033k\033\\\]'
 esac
 
-GIT_PROMPT=~/.config/yozora/tools/git-prompt.sh
+GIT_PROMPT=$YOZORA_PATH/tools/git-prompt.sh
 [ -f $GIT_PROMPT ] && source $GIT_PROMPT
 
 get_git_branch() {
