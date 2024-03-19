@@ -59,6 +59,10 @@ gclone() {
         shift
         shift
         ;;
+      "--recursive"|"-r")
+        recursive="--recursive"
+        shift
+        ;;
       *)
         repo=$1
         shift
@@ -70,6 +74,7 @@ gclone() {
   host=${host:-"github.com"}
   is_ssh=${is_ssh:-"true"}
   target_dir=${target_dir:-""}
+  recursive=${recursive:-""}
 
   if [[ -z $user ]]; then
     echo "No user or global user specified"
@@ -82,11 +87,11 @@ gclone() {
     echo "usage: gclone <repo> [user] [host] [is_ssh]"
     return 1
   fi
-  
+
   if [[ $is_ssh == "true" ]]; then
-    git clone git@$host:$user/$repo.git $target_dir
+    git clone $recursive git@$host:$user/$repo.git $target_dir
   else
-    git clone https://$host/$user/$repo.git $target_dir
+    git clone $recursive https://$host/$user/$repo.git $target_dir
   fi
 }
 
