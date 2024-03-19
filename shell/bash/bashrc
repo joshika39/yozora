@@ -18,18 +18,20 @@ if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# Git completition and prompt
-GIT_COMP=$YOZORA_PATH/tools/git-completion.sh
-[ -f $GIT_COMP ] && source $GIT_COMP
 
+[ -f ~/.bash_exports ] && source ~/.bash_exports
+[ -f ~/.bash_local_exports ] && source ~/.bash_local_exports
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
 [ -f ~/.bash_functions ] && source ~/.bash_functions
 [ -f ~/.bash_prompt ] && source ~/.bash_prompt
 [ -f ~/.bash_completion ] && source ~/.bash_completion
-[ -f ~/.bash_exports ] && source ~/.bash_exports
 [ -f ~/.bash_local ] && source ~/.bash_local
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Git completition and prompt
+GIT_COMP=$YOZORA_PATH/tools/git-completion.sh
+[ -f $GIT_COMP ] && source $GIT_COMP
 
 umask 022
 
