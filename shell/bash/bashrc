@@ -19,7 +19,7 @@ if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 # Git completition and prompt
-GIT_COMP=~/.config/yozora/tools/git-completion.sh
+GIT_COMP=$YOZORA_PATH/tools/git-completion.sh
 [ -f $GIT_COMP ] && source $GIT_COMP
 
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
