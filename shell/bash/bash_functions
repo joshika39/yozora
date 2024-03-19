@@ -36,6 +36,9 @@ brc() {
 # Custom git clone function
 # use with --user <user> --host <host> --is_ssh <is_ssh> --target_dir <target_dir>
 gclone() {
+  usage() {
+      echo "usage: gclone <repo> [--user|-u] <user> [--host|-h] <host> [--is_ssh] <true|false> [--recursive|-r] [--target_dir|-t] <target_dir>"
+  }
   # Parse the arguments in switch case
   while [[ $# -gt 0 ]]; do
     case $1 in
