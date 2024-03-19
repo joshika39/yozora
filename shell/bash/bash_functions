@@ -40,22 +40,22 @@ gclone() {
   while [[ $# -gt 0 ]]; do
     case $1 in
       "--user"|"-u")
-        user=${2:-"$(whoami)"}
+        user=${2}
         shift
         shift
         ;;
       "--host"|"-h")
-        host=${2:-"github.com"}
+        host=$2
         shift
         shift
         ;;
       "--is_ssh")
-        is_ssh=${2:-"true"}
+        is_ssh=$2
         shift
         shift
         ;;
       "--target_dir"|"-t")
-        target_dir=${2:-""}
+        target_dir=$2
         shift
         shift
         ;;
@@ -65,6 +65,11 @@ gclone() {
         ;;
     esac
   done
+
+  user=${user:-"$(whoami)"}
+  host=${host:-"github.com"}
+  is_ssh=${is_ssh:-"true"}
+  target_dir=${target_dir:-""}
 
   if [[ -z $user ]]; then
     echo "No user or global user specified"
