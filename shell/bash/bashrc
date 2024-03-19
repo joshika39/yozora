@@ -23,11 +23,11 @@ GIT_COMP=$YOZORA_PATH/tools/git-completion.sh
 [ -f $GIT_COMP ] && source $GIT_COMP
 
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
-[ -f ~/.bash_local ] && source ~/.bash_local
 [ -f ~/.bash_functions ] && source ~/.bash_functions
 [ -f ~/.bash_prompt ] && source ~/.bash_prompt
 [ -f ~/.bash_completion ] && source ~/.bash_completion
 [ -f ~/.bash_exports ] && source ~/.bash_exports
+[ -f ~/.bash_local ] && source ~/.bash_local
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
