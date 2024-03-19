@@ -66,6 +66,10 @@ gclone() {
         recursive="--recursive"
         shift
         ;;
+      "--help")
+        usage
+        return 0
+        ;;
       *)
         repo=$1
         shift
