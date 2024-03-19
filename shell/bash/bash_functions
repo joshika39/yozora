@@ -89,9 +89,12 @@ gclone() {
   fi
 
   if [[ $is_ssh == "true" ]]; then
-    git clone $recursive git@$host:$user/$repo.git $target_dir
+    command="git clone $recursive git@$host:$user/$repo.git $target_dir"
   else
-    git clone $recursive https://$host/$user/$repo.git $target_dir
+    command="git clone $recursive https://$host/$user/$repo.git $target_dir"
   fi
+
+  echo "Using: $command"
+  eval $command
 }
 
