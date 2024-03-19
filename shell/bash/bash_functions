@@ -85,13 +85,13 @@ gclone() {
 
   if [[ -z $user ]]; then
     echo "No user or global user specified"
-    echo "usage: gclone <repo> [user] [host] [is_ssh]"
+    usage
     return 1
   fi
 
   if [[ -z $repo ]]; then
     echo "No repository specified"
-    echo "usage: gclone <repo> [user] [host] [is_ssh]"
+    usage
     return 1
   fi
 
