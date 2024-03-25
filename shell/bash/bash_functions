@@ -25,13 +25,17 @@ install_krew() {
         shift
         ;;
       "--type"|"-t")
-        type=${2:-"channel"}
+        type=${2}
         shift
         shift
         ;;
       "--help"|"-h")
         usage
         return 0
+        ;;
+      "--dry-run"|"-d")
+        dry_run="true"
+        shift
         ;;
       *)
         echo "Invalid argument: $1"
@@ -41,6 +45,10 @@ install_krew() {
     esac
   done
 
+  dry_run=${dry_run:-"false"}
+  type=${type:-"channel"}
+  version=${version:-"latest"}
+
   if [[ $type == "channel" ]]; then
     type="channel LTS"
   fi 
@@ -49,7 +57,13 @@ install_krew() {
     type="runtime dotnet"
   fi
 
-  sudo bash $YOZORA_PATH/tools/dotnet-install.sh --install-dir /usr/share/dotnet -$type -version $version
+  command="sudo bash $YOZORA_PATH/tools/dotnet-install.sh --install-dir /usr/share/dotnet -$type -version $version"
+
+  echo "Using: $command"
+  
+  if [[ $dry_run -eq "false" ]]; then
+    eval $command
+  fi
 }
 
 # Download the bashrc components from the yozora repository
