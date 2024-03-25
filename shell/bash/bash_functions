@@ -29,7 +29,7 @@ install_krew() {
         shift
         shift
         ;;
-      "--help")
+      "--help"|"-h")
         usage
         return 0
         ;;
