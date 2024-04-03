@@ -9,6 +9,8 @@ git clone https://github.com/joshika39/yozora.git ~/.config/yozora && cd ~/.conf
 bash shell/bash/update.sh --download
 ```
 
+## Convinience commands
+
 ### Package collection updater
 
 If you sourced the bashrc file with: `source ~/.bashrc` then you can use the following command to update the package collection:
@@ -31,7 +33,7 @@ refresh # This will refresh (source) the bashrc file
 brc --upload # This will upload the local bashrc file to the repository
 ```
 
-### Convinience commands
+### Git repository cloner
 ```bash
 gclone <repo-name> # This is used to clone repositories from any specified host or github (default). If there is no user specified then it will clone the repository from the current user (whoami)
 gclone <repo-name> <user-name> # This is used to clone repositories from any specified host or github (default). If there is a user specified then it will clone the repository from the specified user
@@ -40,4 +42,6 @@ gclone <repo-name> <user-name> <host-name> [is_ssh] # This is used to clone repo
 ```
 ### Notes
 
-Add switchable work environment: wayland to xorg
+#### Future plans
+
+- [ ] Add switchable work environment: wayland to xorg
