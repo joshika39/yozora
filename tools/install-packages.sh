@@ -6,13 +6,17 @@
 # `o` is used to install an official package
 # `a` is used to install an AUR package
 # `i` is used to import another configuration file
+# `k` is used to flag a package to keep in case of a removal
 # The `->` is used to split the command from the package name
 
 AUR=()
 OFFICIAL=()
 COMMANDS=()
 SUDO_COMMANDS=()
-IMPORTS=() sep="->"
+IMPORTS=() 
+KEEPS=()
+
+sep="->"
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -34,6 +38,7 @@ while [[ $# -gt 0 ]]; do
       echo "--help, -h to display the help message"
       echo "--path, -p to set the YOZORA_PATH"
       echo "--package, -pkg to set the package collection"
+      echo "--remove, -r to remove the packages"
       exit 0
       ;;
     "-r"|"--remove")
@@ -109,13 +114,15 @@ do
   			 split="${PKG#*$sep}"
 			 AUR+=( "${split}" )
 		fi
+    if [[ ${PKG::1} == "k" ]]; then 
+  			 split="${PKG#*$sep}"
+       KEEPS+=( "${split}" )
+    fi
 	fi
 done < $TEMP_FILE
 
 if (( $(id -u) != 0 )); then
   if [[ "${is_remove}" == "true" ]]; then
-    echo " --> Removing AUR Packages <--"
-    echo "Remove operation is not yet implemented"
     exit 0
   fi
 
@@ -158,16 +165,25 @@ fi
 
 if (( $(id -u) == 0 )); then
   echo
-  official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
+  # combine the official packages and the aur packages into one string
   if [[ "${is_remove}" == "true" ]]; then
-    echo " --> Removing Official Packages <--"
-    pacman -R $official_packages
+    echo " --> Removing Packages <--"
+    aur_packages=$(IFS=" "; echo "${AUR[*]}")
+    official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
+    all_packages="$aur_packages $official_packages"
+    for pkg in ${KEEPS[@]}; do
+      echo "Keeping: $pkg"
+      all_packages=$(echo $all_packages | sed "s/$pkg//g")
+    done
+    echo "Removing: $all_packages"
+    pacman -Rns $all_packages
     exit 0
   fi
   if [[ ${#OFFICIAL[@]} -eq 0 ]]; then
     echo "No official packages to install"
   else
     echo " --> Installing Official Packages <--"
+    official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
     echo "Installing: $official_packages"
     pacman -Syu
     pacman -S $official_packages
