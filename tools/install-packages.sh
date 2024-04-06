@@ -36,6 +36,10 @@ while [[ $# -gt 0 ]]; do
       echo "--package, -pkg to set the package collection"
       exit 0
       ;;
+    "-r"|"--remove")
+      is_remove="true"
+      shift
+      ;;
     *)
       echo "Unknown option: $1"
       exit 1
@@ -53,6 +57,7 @@ if [[ -z $root_path ]]; then
 fi
 
 full_path="$root_path/$package_collection"
+is_remove=${is_remove:-"false"}
 
 while read PKG; do
   if [[ ${PKG::1} != "#" && ${PKG::1} != "" ]]; then
@@ -108,6 +113,11 @@ do
 done < $TEMP_FILE
 
 if (( $(id -u) != 0 )); then
+  if [[ "${is_remove}" == "true" ]]; then
+    echo " --> Removing AUR Packages <--"
+    echo "Remove operation is not yet implemented"
+    exit 0
+  fi
 
   if [[ ${#COMMANDS[@]} -eq 0 ]]; then
     echo "No sudo commands to execute"
@@ -148,11 +158,16 @@ fi
 
 if (( $(id -u) == 0 )); then
   echo
+  official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
+  if [[ "${is_remove}" == "true" ]]; then
+    echo " --> Removing Official Packages <--"
+    pacman -R $official_packages
+    exit 0
+  fi
   if [[ ${#OFFICIAL[@]} -eq 0 ]]; then
     echo "No official packages to install"
   else
     echo " --> Installing Official Packages <--"
-    official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
     echo "Installing: $official_packages"
     pacman -Syu
     pacman -S $official_packages
