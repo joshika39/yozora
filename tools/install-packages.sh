@@ -15,8 +15,11 @@ COMMANDS=()
 SUDO_COMMANDS=()
 IMPORTS=() 
 KEEPS=()
-
 sep="->"
+
+TEMP_FILE=$(mktemp)
+TEMP_DIR=$HOME/.aur-installs
+CURRENT_DIR=$(pwd)
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -72,8 +75,6 @@ while read PKG; do
     fi
   fi
 done < $full_path
-
-TEMP_FILE=$(mktemp)
 
 if [[ ${#IMPORTS[@]} -gt 0 ]]; then
   for file in ${IMPORTS[@]}; do
@@ -138,11 +139,9 @@ if (( $(id -u) != 0 )); then
     echo "No AUR packages to install"
   else
     echo " --> Installing AUR Packages <--"
-    if [[ ! -d $HOME/.aur-installs ]]; then
-      mkdir $HOME/.aur-installs/	
+    if [[ ! -d $TEMP_DIR ]]; then
+      mkdir $TEMP_DIR
     fi
-    TEMP_DIR=$HOME/.aur-installs
-    CURRENT_DIR=$(pwd)
     for ((i = 0; i < ${#COMMANDS[@]}; i++)); do
       eval ${COMMANDS[$i]}
     done
@@ -200,4 +199,5 @@ fi
 
 echo " --> Cleaning up <--"
 rm $TEMP_FILE
+rm -rf $TEMP_DIR
 echo " --> Done <--"
