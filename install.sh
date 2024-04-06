@@ -112,6 +112,27 @@ install_package() {
   sudo bash "$install_script" --path "$folder" --package "$package.conf"
 }
 
+remove_package() {
+  local package=$1
+  local component=$2
+  local install_script="$YOZORA_PATH/tools/install-packages.sh"
+
+  if ! [ -z $component ]; then
+    echo "Component found: $component"
+    folder="$HOME/.config/$component/pkgs"
+  else
+    folder="$YOZORA_PATH/pkg-collections"
+  fi
+
+  if ! [ -f "$folder/$package.conf" ]; then
+    echo "The package: $package does not exist"
+    return 1
+  fi
+
+  bash "$install_script" --path "$folder" --package "$package.conf" --remove
+  sudo bash "$install_script" --path "$folder" --package "$package.conf" --remove
+}
+
 check_component_health() {
   for component in "${!components_health_status[@]}"; do
     if [ -d "$HOME/.config/$component" ] && [ -f "$HOME/.config/$component/healthcheck.sh" ]; then
@@ -165,7 +186,8 @@ help() {
   echo "-h or --help to display the help message"
   echo "-a or --all to install all the available package collections"
   echo "-c or --component to specify the component"
-  echo "-p or --package to specify the package"
+  echo "-p or --package to specify the package collection"
+  echo "-r or --remove to remove the package collection (only works with the -p flag)"
 }
 
 list() {
@@ -193,26 +215,30 @@ install_all() {
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
-    -l|--list)
+    "-l"|"--list")
       list
       exit 0
       ;;
-    -h|--help)
+    "-h"|"--help")
       help
       exit 0
       ;;
-    -a|--all)
+    "-a"|"--all")
       install_all
       exit 0
       ;;
-    -c|--component)
+    "-c"|"--component")
       component=$2
       shift
       shift
       ;;
-    -p|--package)
+    "-p"|"--package")
       package=$2
       shift
+      shift
+      ;;
+    "-r"|"--remove")
+      remove="--remove"
       shift
       ;;
     *)
@@ -225,12 +251,21 @@ done
 if ! [ -z "$package" ]; then
   if ! [ -z "$component" ]; then
     echo "Component specified: $component and package: $package"
-    install_package $package $component
+    if [ -z "$remove" ]; then
+      install_package $package $component
+    else
+      remove_package $package $component
+    fi
   else
     unique_package=$(is_unique_named_package $package)
     if [[ $unique_package == "true" ]]; then
       component=$(get_component_by_package $package)
-      install_package $package $component
+      if [ -z "$remove" ]; then
+        install_package $package $component
+      else
+        remove_package $package $component
+      fi
+
       if [ $? -eq 0 ]; then
         echo "The package: $package has been installed successfully"
       else
