@@ -153,7 +153,7 @@ if (( $(id -u) != 0 )); then
         cd $TEMP_DIR
         git clone https://aur.archlinux.org/$pkg.git
         cd $pkg
-        makepkg -si
+        yes | makepkg -si --noconfirm
         cd $CURRENT_DIR
       else
         echo "$pkg is already installed with version: $(pacman -Q $pkg)"
@@ -185,7 +185,7 @@ if (( $(id -u) == 0 )); then
     official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
     echo "Installing: $official_packages"
     pacman -Syu
-    pacman -S $official_packages
+    yes | pacman -S --noconfirm $official_packages
   fi
   if [[ ${#SUDO_COMMANDS[@]} -eq 0 ]]; then
     echo "No sudo commands to execute"
