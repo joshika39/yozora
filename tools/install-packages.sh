@@ -8,6 +8,8 @@
 # `i` is used to import another configuration file
 # `k` is used to flag a package to keep in case of a removal
 # The `->` is used to split the command from the package name
+# The package line (e.g. `a` or `o`) can be separated with ; to specify the executable after install (e.g. `a->devpod-bin;devpod`)
+# With this the script will check if the package is installed by the second part provided. If it has only one part it will check the first part
 
 AUR=()
 OFFICIAL=()
@@ -20,6 +22,15 @@ sep="->"
 TEMP_FILE=$(mktemp)
 TEMP_DIR=$HOME/.aur-installs
 CURRENT_DIR=$(pwd)
+
+install_aur() {
+  local pkg=$1
+  cd $TEMP_DIR
+  git clone https://aur.archlinux.org/$pkg.git
+  cd $pkg
+  yes | makepkg -si
+  cd $CURRENT_DIR
+}
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -147,16 +158,25 @@ if (( $(id -u) != 0 )); then
     done
     
     for pkg in ${AUR[@]}; do
-      # If the package is not installed or the version is different
-      if [[ ! $(pacman -Q $pkg) ]]; then
-        echo "Installing $pkg"
-        cd $TEMP_DIR
-        git clone https://aur.archlinux.org/$pkg.git
-        cd $pkg
-        yes | makepkg -si --noconfirm
-        cd $CURRENT_DIR
+      install_name=$(echo $pkg | cut -d ";" -f 1)
+      exec_name=$(echo $pkg | cut -d ";" -f 2)
+
+      if [[ -z $exec_name ]]; then
+        exec_name=$install_name
+      fi
+
+      if [[ ! -x $(command -v $exec_name) ]]; then
+        echo "Installing $install_name"
+        install_aur $install_name
       else
-        echo "$pkg is already installed with version: $(pacman -Q $pkg)"
+        echo " --> $install_name is already installed <--"
+        pkg_version=$(pacman -Qi $install_name | grep "Version" | cut -d ":" -f 2 | xargs)
+        aur_version=$(curl -s "https://aur.archlinux.org/packages/$install_name" | grep -oP 'Package Details: \K[^<]*' | awk '{print $2}')
+        if [[ $pkg_version != $aur_version ]]; then
+          echo " --> $install_name is outdated (Installed: $pkg_version, AUR: $aur_version) <--"
+          echo " --> Updating $install_name <--"
+          install_aur $install_name
+        fi
       fi
     done
   fi
@@ -185,7 +205,7 @@ if (( $(id -u) == 0 )); then
     official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
     echo "Installing: $official_packages"
     pacman -Syu
-    yes | pacman -S --noconfirm $official_packages
+    yes | pacman -S $official_packages
   fi
   if [[ ${#SUDO_COMMANDS[@]} -eq 0 ]]; then
     echo "No sudo commands to execute"
