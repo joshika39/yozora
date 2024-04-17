@@ -66,6 +66,7 @@ if [ "$1" == "count" ]; then
   echo $json > $HOME/.yozora/official-updates.json
   count=$(get_package_updates_count $packges)
   echo $count
+  exit 0
 fi
 
 if [ "$1" == "string" ]; then
@@ -75,6 +76,7 @@ if [ "$1" == "string" ]; then
   echo $json > $HOME/.yozora/official-updates.json
   string=$(convert_to_string $packges)
   echo $string
+  exit 0
 fi
 
 if [ "$1" == "json" ]; then
@@ -83,6 +85,7 @@ if [ "$1" == "json" ]; then
   mkdir -p $HOME/.yozora
   echo $json > $HOME/.yozora/official-updates.json
   echo $json
+  exit 0
 fi
 
 if [ "$1" == "json-silent" ]; then
@@ -90,4 +93,8 @@ if [ "$1" == "json-silent" ]; then
   json=$(convert_array_to_json $packges)
   mkdir -p $HOME/.yozora
   echo $json > $HOME/.yozora/official-updates.json
+  exit 0
 fi
+
+echo "Invalid argument: $1"
+exit 1
