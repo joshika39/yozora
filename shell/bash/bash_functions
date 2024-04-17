@@ -12,6 +12,18 @@ install_krew() {
   )
 }
 
+checkupdates() {
+  local type=${1:-"official"}
+
+  if [[ $type == "official" ]]; then
+    sh $YOZORA_PATH/tools/package-manager/official-updates.sh
+  elif [[ $type == "aur" ]]; then
+    sh $YOZORA_PATH/tools/package-manager/aur-updates.sh
+  else
+    echo "Invalid type: $type"
+  fi
+}
+
 .netinstall() {
  usage() {
    echo "usage: .netinstall [--version | -v] <version> [--type | -t] <channel | runtime> [--help]"
