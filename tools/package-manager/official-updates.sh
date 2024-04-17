@@ -16,10 +16,7 @@ get_package_updates() {
     echo "Official packages not found"
     exit 0
   fi
-
   IFS=' ' read -r -a packages <<< "$all_packages"
-  echo "Number of official packages: ${#packages[@]}"
-
   updatable_packages=()
   for package in "${packages[@]}"; do
     if pacman -Q "$package" &> /dev/null; then
@@ -28,7 +25,6 @@ get_package_updates() {
       fi
     fi
   done
-  # Return the updatable_packages array
   echo "${updatable_packages[@]}"
 }
 
@@ -50,14 +46,22 @@ get_package_updates_count() {
 
 convert_array_to_json() {
   local packages=("$@")
-  echo "${packages[@]}" | jq -R . | jq -s .
+  json="{\"packages\": ["
+  for ((i=0; i<"${#packages[@]}"; i++)); do
+    json+="\"${packages[i]}\""
+    if [ $i -lt $((${#packages[@]} - 1)) ]; then
+      json+=", "
+    fi
+  done
+  json+="], \"count\": ${#packages[@]}}"
+  echo "$json"
 }
 
 if [ "$1" == "count" ]; then
   packges=$(get_package_updates)
   json=$(convert_array_to_json $packges)
   mkdir -p $HOME/.yozora
-  echo $json > $HOME/.yozora/offical-updates.json
+  echo $json > $HOME/.yozora/official-updates.json
   count=$(get_package_updates_count $packges)
   echo $count
 fi
@@ -66,7 +70,7 @@ if [ "$1" == "string" ]; then
   packges=$(get_package_updates)
   json=$(convert_array_to_json $packges)
   mkdir -p $HOME/.yozora
-  echo $json > $HOME/.yozora/offical-updates.json
+  echo $json > $HOME/.yozora/official-updates.json
   string=$(convert_to_string $packges)
   echo $string
 fi
