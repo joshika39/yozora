@@ -77,3 +77,17 @@ if [ "$1" == "string" ]; then
   echo $string
 fi
 
+if [ "$1" == "json" ]; then
+  packges=$(get_package_updates)
+  json=$(convert_array_to_json $packges)
+  mkdir -p $HOME/.yozora
+  echo $json > $HOME/.yozora/official-updates.json
+  echo $json
+fi
+
+if [ "$1" == "json-silent" ]; then
+  packges=$(get_package_updates)
+  json=$(convert_array_to_json $packges)
+  mkdir -p $HOME/.yozora
+  echo $json > $HOME/.yozora/official-updates.json
+fi

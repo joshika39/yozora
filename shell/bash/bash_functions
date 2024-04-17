@@ -13,12 +13,18 @@ install_krew() {
 }
 
 checkupdates() {
-  local type=${1:-"official"}
+  local type=${1}
+  if [[ $type != "official" && $type != "aur" ]]; then
+    echo "Invalid type: $type"
+    return 1
+  fi
+
+  local output=${2:-"json-silent"}
 
   if [[ $type == "official" ]]; then
-    sh $YOZORA_PATH/tools/package-manager/official-updates.sh
+    sh $YOZORA_PATH/tools/package-manager/official-updates.sh $output
   elif [[ $type == "aur" ]]; then
-    sh $YOZORA_PATH/tools/package-manager/aur-updates.sh
+    sh $YOZORA_PATH/tools/package-manager/aur-updates.sh $output
   else
     echo "Invalid type: $type"
   fi
