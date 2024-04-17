@@ -16,20 +16,7 @@ fi
 # -h or --help to display the help message
 # -a or --all to install all the available package collections
 
-# Check if the user has other yozora supported packages installed (yozora-i3, yozora-hyprland)
-
-declare -A components_health_status=(
-  ["i3"]="unhealthy"
-  ["hyprland"]="unhealthy"
-  ["polybar"]="unhealthy"
-  ["nvim"]="unhealthy"
-  ["tmux"]="unhealthy"
-  ["ranger"]="unhealthy"
-  ["kitty"]="unhealthy"
-  ["eww"]="unhealthy"
-  ["floorp"]="unhealthy"
-  ["rofi"]="unhealthy"
-)
+source $YOZORA_PATH/tools/package-manager/lib.sh
 
 is_directory() {
   local path=$1
@@ -131,20 +118,6 @@ remove_package() {
 
   bash "$install_script" --path "$folder" --package "$package.conf" --remove
   sudo bash "$install_script" --path "$folder" --package "$package.conf" --remove
-}
-
-check_component_health() {
-  for component in "${!components_health_status[@]}"; do
-    if [ -d "$HOME/.config/$component" ] && [ -f "$HOME/.config/$component/healthcheck.sh" ]; then
-      response=$(bash "$HOME/.config/$component/healthcheck.sh")
-      components_health_status[$component]=$response
-      echo "-> ✅ $component found"
-    else
-      echo "-> ❌ $component not found or unhealthy"
-    fi
-  done
-
-  echo "-> INFO: If there where any unhealthy components, please check the healthcheck.sh file in the component's directory"
 }
 
 list_packages() {
