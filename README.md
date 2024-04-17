@@ -60,3 +60,4 @@ gclone <repo-name> <user-name> <host-name> [is_ssh] # This is used to clone repo
 #### Future plans
 
 - [ ] Add switchable work environment: wayland to xorg
+- [ ] Improve the readme: more about the core update checker
