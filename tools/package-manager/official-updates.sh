@@ -31,11 +31,13 @@ get_package_updates() {
 convert_to_string() {
   local packages=("$@")
   pgk_str=""
-  for package in "${updatable_packages[@]}"; do
-    pgk_str+="$package "
+  for ((i=0; i<"${#packages[@]}"; i++)); do
+    if [ $i -lt $((${#packages[@]} - 1)) ]; then
+      pgk_str+="${packages[i]} "
+    else
+      pgk_str+="${packages[i]}"
+    fi
   done
-  pgk_str=${pgk_str::-1}
-  pgk_str=$(echo $pgk_str | tr -s " ")
   echo "$pgk_str"
 }
 
