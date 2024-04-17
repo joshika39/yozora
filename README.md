@@ -36,7 +36,7 @@ brc --upload # This will upload the local bashrc file to the repository
 ```bash
 # These commands will store the result in a json file under ~/.yozora/
 
-checkupdates # This will check for updates for the official packages in all of the components
+checkupdates official # This will check for updates for the official packages in all of the components
 
 checkupdates aur # This will check for updates for the aur packages in all of the components
 ```
