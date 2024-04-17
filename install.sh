@@ -94,7 +94,7 @@ get_multiple_components_by_package() {
 install_package() {
   local package=$1
   local component=$2
-  local install_script="$YOZORA_PATH/tools/install-packages.sh"
+  local install_script="$YOZORA_PATH/tools/pckage-manager/install-packages.sh"
 
   if ! [ -z $component ]; then
     echo "Component found: $component"
@@ -115,7 +115,7 @@ install_package() {
 remove_package() {
   local package=$1
   local component=$2
-  local install_script="$YOZORA_PATH/tools/install-packages.sh"
+  local install_script="$YOZORA_PATH/tools/package-manager/install-packages.sh"
 
   if ! [ -z $component ]; then
     echo "Component found: $component"
