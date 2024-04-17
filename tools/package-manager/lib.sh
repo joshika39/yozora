@@ -69,13 +69,10 @@ get_base_collection_files() {
 get_official_packages_in_files() {
   local component=$1
   if [ -z "$component" ]; then
-    echo "No component provided" > /dev/tty
     local package_files=($(get_base_collection_files))
   elif [ "$component" == "all" ]; then
-    echo "Getting all component package files" > /dev/tty
     local package_files=($(get_collection_files_in_all_components))
   else
-    echo "Component provided: $component" > /dev/tty
     local package_files=($(get_collection_files_in_component $component))
   fi
 
