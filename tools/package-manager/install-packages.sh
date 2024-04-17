@@ -101,11 +101,12 @@ fi
 
 while read PKG;
 do
-  	if [[ ${PKG::1} != "#" && ${PKG::1} != "" ]]; then 
-  		if [[ ${PKG::1} == "o" ]]; then 
-  			 split="${PKG#*$sep}"
+  if [[ ${PKG::1} != "#" && ${PKG::1} != "" ]]; then 
+    if [[ ${PKG::1} == "o" ]]; then 
+  		split="${PKG#*$sep}"
 			 
 			if [[ ${split:0:4} == "-lts" ]]; then
+        echo "-lts is deprecated, please remove it from the package name"
 				OFFICIAL+="${split#*-lts}$2"	
 			else	
 				OFFICIAL+=" $split"
@@ -130,7 +131,7 @@ do
   			 split="${PKG#*$sep}"
        KEEPS+=( "${split}" )
     fi
-	fi
+  fi
 done < $TEMP_FILE
 
 if (( $(id -u) != 0 )); then
