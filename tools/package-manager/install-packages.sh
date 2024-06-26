@@ -28,7 +28,7 @@ install_aur() {
   cd $TEMP_DIR
   git clone https://aur.archlinux.org/$pkg.git
   cd $pkg
-  yes | makepkg -si
+  makepkg -si
   cd $CURRENT_DIR
 }
 
@@ -206,7 +206,7 @@ if (( $(id -u) == 0 )); then
     official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
     echo "Installing: $official_packages"
     pacman -Syu
-    yes | pacman -S $official_packages
+    pacman -S $official_packages
   fi
   if [[ ${#SUDO_COMMANDS[@]} -eq 0 ]]; then
     echo "No sudo commands to execute"
