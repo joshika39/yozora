@@ -1,0 +1,9 @@
+[Security]
+EAP-Method=PEAP
+EAP-Identity=anonymous@<uni-domain>
+EAP-PEAP-Phase2-Method=Tunneled-PAP
+EAP-PEAP-Phase2-Identity=<username>@<uni-domain>
+EAP-PEAP-Phase2-Password=<password>
+
+[Settings]
+AutoConnect=true
