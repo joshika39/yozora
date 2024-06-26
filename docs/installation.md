@@ -10,7 +10,18 @@ This is a guide on how I install Arch Linux. It is not the only way to install A
 
 I usually install the base packages for me, which is:
 
-`pacstrap -K /mnt base linux linux-firmware linux-headers sudo git vim openssh`
+`pacstrap -K /mnt base linux linux-firmware linux-headers sudo git vim`
+
+After that `arch-chroot /mnt` into the new installation, and install and enable a few more required packages:
+
+```sh
+# install the packages
+pacman -S iwctl openssh
+
+# enable them
+systemctl enable iwd
+systemctl enable sshd
+```
 
 ### Network configs
 
