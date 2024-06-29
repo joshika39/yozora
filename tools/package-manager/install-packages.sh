@@ -134,6 +134,42 @@ do
   fi
 done < $TEMP_FILE
 
+
+if (( $(id -u) == 0 )); then
+  echo
+  # combine the official packages and the aur packages into one string
+  if [[ "${is_remove}" == "true" ]]; then
+    echo " --> Removing Packages <--"
+    aur_packages=$(IFS=" "; echo "${AUR[*]}")
+    official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
+    all_packages="$aur_packages $official_packages"
+    for pkg in ${KEEPS[@]}; do
+      echo "Keeping: $pkg"
+      all_packages=$(echo $all_packages | sed "s/$pkg//g")
+    done
+    echo "Removing: $all_packages"
+    pacman -Rns $all_packages
+    exit 0
+  fi
+  if [[ ${#OFFICIAL[@]} -eq 0 ]]; then
+    echo "No official packages to install"
+  else
+    echo " --> Installing Official Packages <--"
+    official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
+    echo "Installing: $official_packages"
+    pacman -Syu
+    pacman -S $official_packages
+  fi
+  if [[ ${#SUDO_COMMANDS[@]} -eq 0 ]]; then
+    echo "No sudo commands to execute"
+  else
+    echo " --> Executing sudo commands <--"
+    for ((i = 0; i < ${#SUDO_COMMANDS[@]}; i++)); do
+      eval ${SUDO_COMMANDS[$i]}
+    done
+  fi
+fi
+
 if (( $(id -u) != 0 )); then
   if [[ "${is_remove}" == "true" ]]; then
     exit 0
@@ -179,41 +215,6 @@ if (( $(id -u) != 0 )); then
           install_aur $install_name
         fi
       fi
-    done
-  fi
-fi
-
-if (( $(id -u) == 0 )); then
-  echo
-  # combine the official packages and the aur packages into one string
-  if [[ "${is_remove}" == "true" ]]; then
-    echo " --> Removing Packages <--"
-    aur_packages=$(IFS=" "; echo "${AUR[*]}")
-    official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
-    all_packages="$aur_packages $official_packages"
-    for pkg in ${KEEPS[@]}; do
-      echo "Keeping: $pkg"
-      all_packages=$(echo $all_packages | sed "s/$pkg//g")
-    done
-    echo "Removing: $all_packages"
-    pacman -Rns $all_packages
-    exit 0
-  fi
-  if [[ ${#OFFICIAL[@]} -eq 0 ]]; then
-    echo "No official packages to install"
-  else
-    echo " --> Installing Official Packages <--"
-    official_packages=$(IFS=" "; echo "${OFFICIAL[*]}")
-    echo "Installing: $official_packages"
-    pacman -Syu
-    pacman -S $official_packages
-  fi
-  if [[ ${#SUDO_COMMANDS[@]} -eq 0 ]]; then
-    echo "No sudo commands to execute"
-  else
-    echo " --> Executing sudo commands <--"
-    for ((i = 0; i < ${#SUDO_COMMANDS[@]}; i++)); do
-      eval ${SUDO_COMMANDS[$i]}
     done
   fi
 fi
