@@ -203,6 +203,7 @@ if (( $(id -u) != 0 )); then
       fi
 
       if [[ ! -x $(command -v $exec_name) ]]; then
+        echo " --> $install_name is not installed <--"
         echo "Installing $install_name"
         install_aur $install_name
       else
