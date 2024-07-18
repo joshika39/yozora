@@ -95,8 +95,8 @@ install_package() {
     return 1
   fi
 
-  bash "$install_script" --path "$folder" --package "$package.conf"
   sudo bash "$install_script" --path "$folder" --package "$package.conf"
+  bash "$install_script" --path "$folder" --package "$package.conf"
 }
 
 remove_package() {
