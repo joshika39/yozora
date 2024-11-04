@@ -8,8 +8,7 @@
 #     User=$'\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]'
 # fi
 
-if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null
-then
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
 	# We have color support; assume it's compliant with Ecma-48
 	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
 	# a case would tend to support setf rather than setaf.)
@@ -20,19 +19,20 @@ fi
 
 # See: http://aperiodic.net/screen/title_examples#setting_the_title_to_the_name_of_the_running_program
 case $TERM in screen*)
-  PS1=${PS1}'\[\033k\033\\\]'
+	PS1=${PS1}'\[\033k\033\\\]'
+	;;
 esac
 
-GIT_PROMPT=$YOZORA_PATH/tools/git-prompt.sh
+GIT_PROMPT=$YOZORA_PATH/os/scripts/git-prompt.sh
 [ -f $GIT_PROMPT ] && source $GIT_PROMPT
 
 get_git_branch() {
-  if [ -f $GIT_PROMPT ]; then
-    res=$(__git_ps1)
-    echo -n "$res"
-  else
-    echo -n "(no git file)"
-  fi
+	if [ -f $GIT_PROMPT ]; then
+		res=$(__git_ps1)
+		echo -n "$res"
+	else
+		echo -n "(no git file)"
+	fi
 }
 
 PS1=""
@@ -40,6 +40,6 @@ PS1+="╔═╦═══ [\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]] - (\[\e[3
 PS1+="\n"
 PS1+="╚═╩═ *** \[\e[0m\]"
 
-export PS1;
+export PS1
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
