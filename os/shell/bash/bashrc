@@ -15,7 +15,7 @@ shopt -s checkwinsize
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
-	debian_chroot=$(cat /etc/debian_chroot)
+  debian_chroot=$(cat /etc/debian_chroot)
 fi
 
 [ -f ~/.bash_exports ] && source ~/.bash_exports
@@ -25,8 +25,9 @@ fi
 [ -f ~/.bash_prompt ] && source ~/.bash_prompt
 [ -f ~/.bash_completion ] && source ~/.bash_completion
 [ -f ~/.bash_local ] && source ~/.bash_local
-
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+[ -d ~/.asdf/ ] && source ~/.asdf/asdf.sh
+[ -d ~/.asdf/ ] && source ~/.asdf/completions/asdf.bash
 
 # Git completition and prompt
 GIT_COMP=$YOZORA_PATH/os/scripts/git-completion.sh
@@ -35,7 +36,7 @@ GIT_COMP=$YOZORA_PATH/os/scripts/git-completion.sh
 umask 022
 
 rdp() {
-	xfreerdp "/size:${3:-1920x1080}" /p:$2 /u:$1 +clipboard /sound:sys:pulse /v:100.111.97.31:3389
+  xfreerdp "/size:${3:-1920x1080}" /p:$2 /u:$1 +clipboard /sound:sys:pulse /v:100.111.97.31:3389
 }
 
 unset npm_config_prefix
