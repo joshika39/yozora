@@ -91,6 +91,11 @@ brc() {
   bash $YOZORA_PATH/os/shell/bash/updater.sh --$operation
 }
 
+haspkg() {
+  pkgs=$1
+  bash $YOZORA_PATH/os/arch/tools/has-package.sh $pkgs
+}
+
 # Custom git clone function
 # use with --user <user> --host <host> --is_ssh <is_ssh> --target_dir <target_dir>
 gclone() {

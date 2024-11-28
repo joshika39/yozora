@@ -1,8 +1,30 @@
 #!/bin/bash
 
-packages=$1
-
 base_url="https://archlinux.org/packages/search/json/?name="
+
+help() {
+  echo "Usage: has-package.sh [options] [package1] [package2] ..."
+  echo "Options:"
+  echo -e "\t-h, --help\tShow this help message and exit"
+}
+
+PACKAGES=()
+
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+  "-h" | "--help")
+    help
+    exit 0
+    ;;
+  *)
+    PACKAGES+=("$1")
+    shift
+    ;;
+  esac
+done
+
+echo "Gathered packages: ${PACKAGES[@]}"
 
 check_package() {
   local pkgname=$1
@@ -15,6 +37,6 @@ check_package() {
   fi
 }
 
-for pkg in $packages; do
-  check_package $pkg
+for pkg in "${PACKAGES[@]}"; do
+  check_package "$pkg"
 done
