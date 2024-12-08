@@ -76,7 +76,7 @@ checkupdates() {
     type="runtime dotnet"
   fi
 
-  command="sudo bash $YOZORA_PATH/tools/dotnet-install.sh --install-dir /usr/share/dotnet -$type -version $version"
+  command="sudo bash $YOZORA_PATH/os/arch/tools/dotnet-install.sh --install-dir /usr/share/dotnet -$type -version $version"
 
   echo "Using: $command"
 
@@ -92,8 +92,8 @@ brc() {
 }
 
 haspkg() {
-  pkgs=$1
-  bash $YOZORA_PATH/os/arch/tools/has-package.sh $pkgs
+  args=("$@")
+  bash $YOZORA_PATH/os/arch/tools/has-package.sh "${args[@]}"
 }
 
 # Custom git clone function
