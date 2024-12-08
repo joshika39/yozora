@@ -26,12 +26,15 @@ done
 
 echo "Gathered packages: ${PACKAGES[@]}"
 
+EXISTING_PACKAGES=()
+
 check_package() {
   local pkgname=$1
   response=$(curl -s "${base_url}${pkgname}")
   exists=$(echo "$response" | jq '.results | length > 0')
   if [[ $exists == "true" ]]; then
     echo "$pkgname: Yes"
+    EXISTING_PACKAGES+=("$pkgname")
   else
     echo "$pkgname: No"
   fi
@@ -40,3 +43,6 @@ check_package() {
 for pkg in "${PACKAGES[@]}"; do
   check_package "$pkg"
 done
+
+echo "Run the following command to install the existing packages:"
+echo "sudo pacman -S ${EXISTING_PACKAGES[@]}"
