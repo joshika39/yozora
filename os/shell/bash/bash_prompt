@@ -35,11 +35,24 @@ get_git_branch() {
 	fi
 }
 
-PS1=""
-PS1+="╔═╦═══ [\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]] - (\[\e[39;1m\]\j\[\e[0m\]) - [\[\e[34m\]\w\e[1;33m\$(get_git_branch)\e[0m\[\e[0m\]]"
-PS1+="\n"
-PS1+="╚═╩═ *** \[\e[0m\]"
+# Define colors (foreground and background pairs)
+USER_COLOR_FG="\[\e[38;5;190m\]" # #BAFB00 (User text color)
+USER_COLOR_BG="\[\e[48;5;190m\]" # #BAFB00 (User background)
 
-export PS1
-export CLICOLOR=1
-export LSCOLORS=ExFxBxDxCxegedabagacad
+HOST_COLOR_FG="\[\e[38;5;147m\]" # #9CA0ED (Host text color)
+HOST_COLOR_BG="\[\e[48;5;147m\]" # #9CA0ED (Host background)
+
+BRANCH_COLOR_FG="\[\e[38;5;217m\]" # #FF9D9B (Git branch text color)
+BRANCH_COLOR_BG="\[\e[48;5;217m\]" # #FF9D9B (Git branch background)
+
+PATH_COLOR_FG="\[\e[38;5;136m\]" # #B58900
+PATH_COLOR_BG="\[\e[48;5;230m\]" # #FDF6E3
+
+RESET="\[\e[0m\]"
+
+# Powerline-style prompt with color transitions
+PS1=""
+PS1+="╔═╦═══ ${USER_COLOR_BG}${PATH_COLOR_FG}${RESET}${USER_COLOR_FG}\u ${USER_COLOR_BG}${HOST_COLOR_FG}${RESET}${HOST_COLOR_FG}\h ${HOST_COLOR_BG}${PATH_COLOR_BG}${RESET}"
+PS1+="${PATH_COLOR_FG}\w${BRANCH_COLOR_BG}${BRANCH_COLOR_FG}\$(get_git_branch)${RESET}"
+PS1+="\n"
+PS1+="╚═╩═ *** ${RESET}"
