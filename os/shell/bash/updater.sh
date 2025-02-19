@@ -13,6 +13,16 @@ if [ ! -d $REPO_DIR ]; then
 	exit 1
 fi
 
+# Returns the operating system name (mac, arch, ...)
+get_os() {
+	os="$OSTYPE"
+	case os in
+	darwin*) echo "mac" ;;
+	linux*) echo "arch" ;;
+	*) echo "unknown" ;;
+	esac
+}
+
 downlaod_files() {
 	folder=${2:-"os/shell/bash"}
 	files=$1
@@ -54,7 +64,8 @@ upload_files() {
 }
 
 FILES=".bashrc .bash_aliases .bash_functions .bash_profile .bash_prompt .bash_exports"
-HOME_FILES=".xinitrc .xprofile"
+
+# HOME_FILES=".xinitrc .xprofile"   # TODO: Implement the home files properly
 
 UPLOAD=false
 
@@ -70,11 +81,12 @@ fi
 
 if [ "$UPLOAD" == "true" ]; then
 	upload_files "$FILES"
-	upload_files "$HOME_FILES" "home"
+	upload_files
+	# upload_files "$HOME_FILES" "home"  # TODO: Implement the home files properly
 fi
 
 if [ "$DOWNLOAD" == "true" ]; then
 	downlaod_files "$FILES"
-	downlaod_files "$HOME_FILES" "home"
+	# downlaod_files "$HOME_FILES" "home"  # TODO: Implement the home files properly
 	echo "--> Run the command: 'refresh' to apply the changes in the current shell session."
 fi
