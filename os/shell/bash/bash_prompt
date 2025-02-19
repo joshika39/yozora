@@ -36,23 +36,24 @@ get_git_branch() {
 }
 
 # Define colors (foreground and background pairs)
-USER_COLOR_FG="\[\e[38;5;190m\]" # #BAFB00 (User text color)
-USER_COLOR_BG="\[\e[48;5;190m\]" # #BAFB00 (User background)
+USER_FG="\[\e[38;5;190m\]" # #BAFB00 (User text color)
+USER_BG="\[\e[48;5;190m\]" # #BAFB00 (User background)
 
-HOST_COLOR_FG="\[\e[38;5;147m\]" # #9CA0ED (Host text color)
-HOST_COLOR_BG="\[\e[48;5;147m\]" # #9CA0ED (Host background)
+HOST_FG="\[\e[38;5;147m\]" # #9CA0ED (Host text color)
+HOST_BG="\[\e[48;5;147m\]" # #9CA0ED (Host background)
 
-BRANCH_COLOR_FG="\[\e[38;5;217m\]" # #FF9D9B (Git branch text color)
-BRANCH_COLOR_BG="\[\e[48;5;217m\]" # #FF9D9B (Git branch background)
+PINK_FG="\[\e[38;5;217m\]" # #FF9D9B (Git branch text color)
+PINK_BG="\[\e[48;5;217m\]" # #FF9D9B (Git branch text color)
 
-PATH_COLOR_FG="\[\e[38;5;136m\]" # #B58900
-PATH_COLOR_BG="\[\e[48;5;230m\]" # #FDF6E3
+YELLOW_BG="\[\e[48;5;136m\]" # #B58900
+YELLOW_FG="\[\e[38;5;136m\]" # #B58900
+WHITE_FG="\[\e[38;5;230m\]"  # #FDF6E3
 
 RESET="\[\e[0m\]"
 
 # Powerline-style prompt with color transitions
-PS1=""
-PS1+="╔═╦═══ ${USER_COLOR_BG}${PATH_COLOR_FG}${RESET}${USER_COLOR_FG}\u ${USER_COLOR_BG}${HOST_COLOR_FG}${RESET}${HOST_COLOR_FG}\h ${HOST_COLOR_BG}${PATH_COLOR_BG}${RESET}"
-PS1+="${PATH_COLOR_FG}\w${BRANCH_COLOR_BG}${BRANCH_COLOR_FG}\$(get_git_branch)${RESET}"
-PS1+="\n"
-PS1+="╚═╩═ *** ${RESET}"
+# 
+
+PS1="${WHITE_FG}${YELLOW_BG} \w ${RESET}${YELLOW_FG}${RESET}${PINK_FG}\$(get_git_branch)${RESET} > "
+
+export PS1
