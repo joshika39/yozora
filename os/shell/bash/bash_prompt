@@ -54,6 +54,9 @@ RESET="\[\e[0m\]"
 # Powerline-style prompt with color transitions
 # 
 
-PS1="${WHITE_FG}${YELLOW_BG} \w ${RESET}${YELLOW_FG}${RESET}${PINK_FG}\$(get_git_branch)${RESET} > "
+# at_home=$([ "$(pwd)" = "$HOME" ] && echo "@home" || echo "")  # TODO: Fix to refresh after each dir change like git branch
+at_home=""
+
+PS1="${WHITE_FG}${YELLOW_BG} \w $at_home${RESET}${YELLOW_FG}${RESET}${PINK_FG}\$(get_git_branch)${RESET} > "
 
 export PS1
