@@ -28,6 +28,8 @@ fi
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 [ -d ~/.asdf/ ] && source ~/.asdf/asdf.sh
 [ -d ~/.asdf/ ] && source ~/.asdf/completions/asdf.bash
+[ -f ~/.cargo/env ] && source "$HOME/.cargo/env"
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
 # Git completition and prompt
 GIT_COMP=$YOZORA_PATH/os/scripts/git-completion.sh
