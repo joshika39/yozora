@@ -1,6 +1,6 @@
 #!/bin/bash
 
-bash $YOZORA_HOME/os/mac/scripts/create-streaming-spaces.sh
+bash $YOZORA_PATH/os/mac/scripts/create-streaming-spaces.sh
 
 sh ~/.config/yabai/rules/streaming
 sh ~/.config/yabai/rules/streaming apply
