@@ -4,3 +4,7 @@ bash $YOZORA_PATH/os/mac/scripts/create-streaming-spaces.sh
 
 sh ~/.config/yabai/rules/streaming
 sh ~/.config/yabai/rules/streaming apply
+
+# Start streaming apps (OBS, Audio Hijack, etc)
+open ~/Applications/OBS.app
+open ~/Applications/Audio\ Hijack.app
