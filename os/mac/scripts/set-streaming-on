@@ -2,9 +2,26 @@
 
 bash $YOZORA_PATH/os/mac/scripts/create-streaming-spaces.sh
 
+yes all | history delete --contains "SHARED"
+yes all | history delete --contains ".osu."
+yes all | history delete --contains "ping"
+yes all | history delete --contains "youtube."
+yes all | history delete --contains "google."
+yes all | history delete --contains "cheat"
+yes all | history delete --contains "history delete"
+yes all | history delete --contains "yt-dlp"
+
+echo "Killing unnecessary apps..."
+
+pkill -x "Safari"
+pkill -x "Keychain Access"
+pkill -x "Things3"
+pkill -x "Obsidian"
+
 sh ~/.config/yabai/rules/streaming
 sh ~/.config/yabai/rules/streaming apply
 
 # Start streaming apps (OBS, Audio Hijack, etc)
+open ~/Applications/KeyCastr.app
 open ~/Applications/OBS.app
 open ~/Applications/Audio\ Hijack.app

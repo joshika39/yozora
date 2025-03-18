@@ -2,3 +2,6 @@
 
 pkill nowplaying-cli
 
+# Stop streaming apps (OBS, etc)
+pkill -x "OBS"
+pkill -x "Übersicht"
