@@ -3,4 +3,4 @@
 # NOTE: macOS specific exports
 
 export YOZORA_PATH=$HOME/.config/yozora
-export PATH=/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH
+export PATH=/opt/homebrew/sbin:/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH

@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
 
 # NOTE: Arch linux specific exports
-#
 
 export DOTNET_ROOT=/usr/share/dotnet
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 
-JAVA_HOME=/usr/lib/jvm/java-11-openjdk
-export JAVA_HOME
-PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:$lpath:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
+PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
 PATH="$HOME/.cargo/bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"
+
 PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH
-
-export YOZORA_PATH=$HOME/.config/yozora
 
 export GTK_IM_MODULE='ibus'
 export QT_IM_MODULE='ibus'
