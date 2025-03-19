@@ -10,20 +10,13 @@ export DOTNET_ROOT=/usr/share/dotnet
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 
 # Exporting PATH
-PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:$lpath:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
-PATH="$HOME/.cargo/bin:$PATH"
+PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:$PATH"
+[[ -d $HOME/.cargo ]] && PATH="$HOME/.cargo/bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"
-PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-PATH="$PATH:/home/joshika39/.local/share/JetBrains/Toolbox/scripts"
+PATH="/home/joshika39/.local/share/JetBrains/Toolbox/scripts:$PATH"
+PATH="/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
 export PATH
 
 # YOZORA_PATH is used to allow easy access to the yozora configuration directory
 export YOZORA_PATH=$HOME/.config/yozora
-
-# TODO: Move the exoprts to the `arch` specific exports
-export GTK_IM_MODULE='ibus'
-export QT_IM_MODULE='ibus'
-export XMODIFIERS=@im='ibus'
-export GLFW_IM_MODULE=ibus
-
 export EDITOR=nvim
