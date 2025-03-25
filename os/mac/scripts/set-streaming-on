@@ -1,4 +1,13 @@
-#!/bin/bash
+#!/opt/homebrew/bin/fish
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Prepare for streaming
+# @raycast.mode silent
+
+# Documentation:
+# @raycast.author joshika39
+# @raycast.authorURL https://raycast.com/joshika39
 
 bash $YOZORA_PATH/os/mac/scripts/create-streaming-spaces.sh
 
