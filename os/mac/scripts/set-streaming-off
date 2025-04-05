@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Turn off streaming mode
+# @raycast.mode silent
+
+# Documentation:
+# @raycast.author joshika39
+# @raycast.authorURL https://raycast.com/joshika39
+
 pkill nowplaying-cli
 
 pkill -x "OBS"
