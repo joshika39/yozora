@@ -8,11 +8,12 @@
 # Optional parameters:
 # @raycast.icon ./images/shlink.png
 # @raycast.packageName Shlink
-# @raycast.argument2 { "type": "text", "placeholder": "URL", "optional": true, "percentEncoded": false }
+# @raycast.argument1 { "type": "text", "placeholder": "URL", "percentEncoded": false }
+# @raycast.argument2 { "type": "text", "placeholder": "Custom Slug (optional)", "optional": true, "percentEncoded": false }
 
 # Documentation:
 # @raycast.author joshika39
-# @raycast.description Create a short URL using Shlink
+# @raycast.description Create a short URL using Shlink with an optional custom slug
 # @raycast.authorURL https://github.com/joshika39
 
 # Set the following environment variables in your .env file
@@ -31,9 +32,6 @@ PROTOCOL=$SHLINK_PROTOCOL
 SH_URL="$PROTOCOL://$BASEURL"
 TAG=${SHLINK_TAG:-""}
 
-echo "$APIKEY, $SH_URL"
-echo ""
-
 if [ -z "$APIKEY" ]; then
 	echo "Please set the SHLINK_APIKEY environment variable in your .env file."
 	exit 1
@@ -50,19 +48,26 @@ else
 	URL=$1
 fi
 
+SLUG=${2:-""}
+
 if [[ $URL =~ ^https?://[a-zA-Z0-9./?=_-]*$ ]]; then
-	SHORT_URL=$(curl --location --silent --request POST ''"$SH_URL"'/rest/v1/short-urls' \
-		--header 'Content-Type: application/json' \
-		--header 'X-Api-Key: '"$APIKEY"'' \
-		--data-raw '{
+	JSON_PAYLOAD='{
         "longUrl": "'"$URL"'",
         "validateUrl": false,
-        "tags": [
-            "'$TAG'"
-        ],
+        "tags": ["'"$TAG"'"],
         "findIfExists": true,
         "domain": "'"$BASEURL"'"
-    }' | jq -r '.shortUrl')
+    }'
+
+	# Add the custom slug to the payload if provided
+	if [ -n "$SLUG" ]; then
+		JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | jq --arg slug "$SLUG" '. + { "customSlug": $slug }')
+	fi
+
+	SHORT_URL=$(curl --location --silent --request POST "$SH_URL/rest/v1/short-urls" \
+		--header 'Content-Type: application/json' \
+		--header 'X-Api-Key: '"$APIKEY"'' \
+		--data-raw "$JSON_PAYLOAD" | jq -r '.shortUrl')
 
 	if [ -n "$SHORT_URL" ]; then
 		echo "$SHORT_URL" | pbcopy
@@ -71,7 +76,6 @@ if [[ $URL =~ ^https?://[a-zA-Z0-9./?=_-]*$ ]]; then
 		echo "Error: Could not create short URL"
 		exit 1
 	fi
-
 else
 	echo "Invalid URL \"$URL\""
 	exit 1
