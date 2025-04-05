@@ -10,6 +10,7 @@
 # @raycast.packageName Shlink
 # @raycast.argument1 { "type": "text", "placeholder": "URL", "percentEncoded": false }
 # @raycast.argument2 { "type": "text", "placeholder": "Custom Slug (optional)", "optional": true, "percentEncoded": false }
+# @raycast.argument3 { "type": "text", "placeholder": "Tag (optional)", "optional": true, "percentEncoded": false }
 
 # Documentation:
 # @raycast.author joshika39
@@ -30,7 +31,6 @@ APIKEY=$SHLINK_APIKEY
 BASEURL=$SHLINK_URL
 PROTOCOL=$SHLINK_PROTOCOL
 SH_URL="$PROTOCOL://$BASEURL"
-TAG=${SHLINK_TAG:-""}
 
 if [ -z "$APIKEY" ]; then
 	echo "Please set the SHLINK_APIKEY environment variable in your .env file."
@@ -49,6 +49,8 @@ else
 fi
 
 SLUG=${2:-""}
+TAG=${SHLINK_TAG:-""}
+TAG=${3:-$TAG}
 
 if [[ $URL =~ ^https?://[a-zA-Z0-9./?=_-]*$ ]]; then
 	JSON_PAYLOAD='{
