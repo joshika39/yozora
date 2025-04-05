@@ -28,7 +28,11 @@ set +a
 APIKEY=$SHLINK_APIKEY
 BASEURL=$SHLINK_URL
 PROTOCOL=$SHLINK_PROTOCOL
+SH_URL="$PROTOCOL://$BASEURL"
 TAG=${SHLINK_TAG:-""}
+
+echo "$APIKEY, $SH_URL"
+echo ""
 
 if [ -z "$APIKEY" ]; then
 	echo "Please set the SHLINK_APIKEY environment variable in your .env file."
@@ -47,7 +51,7 @@ else
 fi
 
 if [[ $URL =~ ^https?://[a-zA-Z0-9./?=_-]*$ ]]; then
-	SHORT_URL=$(curl --location --silent --request POST ''"$PROTOCOL"'/rest/v1/short-urls' \
+	SHORT_URL=$(curl --location --silent --request POST ''"$SH_URL"'/rest/v1/short-urls' \
 		--header 'Content-Type: application/json' \
 		--header 'X-Api-Key: '"$APIKEY"'' \
 		--data-raw '{
