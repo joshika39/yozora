@@ -1,0 +1,5 @@
+[git_metrics]
+disabled = false
+
+[git_status]
+disabled = true
