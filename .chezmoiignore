@@ -15,5 +15,11 @@ backups/**
 .Brewfile
 scripts/darwin/
 scripts/darwin/**
+{{- else if ne .chezmoi.os "linux" }}
+scripts/linux/
+scripts/linux/**
+{{- else if ne .chezmoi.os "windows" }}
+scripts/windows/
+scripts/windows/**
 {{- end }}
 

@@ -5,12 +5,13 @@ OS="{{- .chezmoi.os }}"
 src_dir="$HOME/scripts/$OS"
 dest_dir="$HOME/scripts"
 
-if [ -d $src_dir ]; then
-  echo "Moving everything from $src_dir to $dest_dir"
-  mv $src_dir/* $dest_dir
+cd "${src_dir}" || exit 1
 
-  echo "Removing $src_dir"
-  rmdir $src_dir 2>/dev/null || true
-else
-    echo "Source directory $src_dir does not exist."
-fi
+find . -type f | while IFS= read -r file; do
+  dest="$dest_dir/${file#./}"
+  mkdir -p "$(dirname "$dest")"
+  mv -f "$file" "$dest"
+done
+
+find . -type d -empty -delete
+rmdir $src_dir 2> /dev/null || true
