@@ -13,5 +13,7 @@ backups/**
 
 {{- if ne .chezmoi.os "darwin" }}
 .Brewfile
+scripts/darwin/
+scripts/darwin/**
 {{- end }}
 
