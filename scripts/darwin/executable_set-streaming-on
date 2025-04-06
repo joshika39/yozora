@@ -1,0 +1,27 @@
+#!/opt/homebrew/bin/fish
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Prepare for streaming
+# @raycast.mode silent
+
+# Documentation:
+# @raycast.author joshika39
+# @raycast.authorURL https://raycast.com/joshika39
+
+bash $YOZORA_PATH/os/mac/scripts/create-streaming-spaces.sh
+
+echo "Killing unnecessary apps..."
+
+pkill -x "Safari"
+pkill -x "Keychain Access"
+pkill -x "Things3"
+pkill -x "Obsidian"
+
+sh ~/.config/yabai/rules/streaming
+sh ~/.config/yabai/rules/streaming apply
+
+# Start streaming apps (OBS, Audio Hijack, etc)
+#open ~/Applications/keyCastr.app
+#open ~/Applications/Audio\ Hijack.app
+#open ~/Applications/Ubersicht.app

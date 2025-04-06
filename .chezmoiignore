@@ -1,1 +1,17 @@
 README.md
+
+*.txt   
+*/*.txt 
+
+*/*.org#
+
+backups/   
+backups/** 
+
+**/.env
+**/.env.local
+
+{{- if ne .chezmoi.os "darwin" }}
+.Brewfile
+{{- end }}
+

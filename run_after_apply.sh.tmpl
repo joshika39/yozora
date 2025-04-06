@@ -1,0 +1,19 @@
+#!/bin/bash
+
+OS={{- .chezmoi.os }}
+
+$src_dir="$HOME/scripts/$OS"
+$dest_dir="$HOME/scripts"
+
+if [ -d "$src_dir" ]; then
+	echo "Moving $os scripts from $src_dir to $dest_dir"
+	for file in "$src_dir"/*; do
+		if [ -f "$file" ]; then
+			mv "$file" "$dest_dir/"
+			echo "Moved $(basename "$file") to $dest_dir"
+		fi
+	done
+	rmdir "$src_dir" 2>/dev/null
+else
+	echo "No $os scripts to move."
+fi
