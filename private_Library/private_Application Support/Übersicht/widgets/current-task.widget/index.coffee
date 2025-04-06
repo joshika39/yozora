@@ -1,4 +1,4 @@
-command: "osascript ~/.config/yozora/os/mac/scripts/next-task.applescript"
+command: "osascript ~/scripts/next-task.applescript"
 refreshFrequency: 1000
 
 style: """
