@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+
+install_krew() {
+  (
+    set -x
+    cd "$(mktemp -d)" &&
+      OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+      ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+      KREW="krew-${OS}_${ARCH}" &&
+      curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+      tar zxvf "${KREW}.tar.gz" &&
+      ./"${KREW}" install krew
+  )
+}
+
+checkupdates() {
+  local type=${1}
+  if [[ $type != "official" && $type != "aur" ]]; then
+    echo "Invalid type: $type"
+    return 1
+  fi
+
+  local output=${2:-"json-silent"}
+
+  if [[ $type == "official" ]]; then
+    sh $YOZORA_PATH/tools/package-manager/official-updates.sh $output
+  elif [[ $type == "aur" ]]; then
+    sh $YOZORA_PATH/tools/package-manager/aur-updates.sh $output
+  else
+    echo "Invalid type: $type"
+  fi
+}
+
+.netinstall() {
+  usage() {
+    echo "usage: .netinstall [--version | -v] <version> [--type | -t] <channel | runtime> [--help]"
+  }
+  # Parse the arguments in switch case
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    "--version" | "-v")
+      version=${2}
+      shift
+      shift
+      ;;
+    "--type" | "-t")
+      type=${2}
+      shift
+      shift
+      ;;
+    "--help" | "-h")
+      usage
+      return 0
+      ;;
+    "--dry-run" | "-d")
+      dry_run="true"
+      shift
+      ;;
+    *)
+      echo "Invalid argument: $1"
+      usage
+      return 1
+      ;;
+    esac
+  done
+
+  dry_run=${dry_run:-"false"}
+  type=${type:-"channel"}
+  version=${version:-"latest"}
+
+  if [[ $type == "channel" ]]; then
+    type="channel LTS"
+  fi
+
+  if [[ $type == "runtime" ]]; then
+    type="runtime dotnet"
+  fi
+
+  command="sudo bash $YOZORA_PATH/os/arch/tools/dotnet-install.sh --install-dir /usr/share/dotnet -$type -version $version"
+
+  echo "Using: $command"
+
+  if [[ $dry_run -eq "false" ]]; then
+    eval $command
+  fi
+}
+
+# Download the bashrc components from the yozora repository
+brc() {
+  operation=${1:-"download"}
+  bash $YOZORA_PATH/os/shell/bash/updater.sh --$operation
+}
+
+haspkg() {
+  args=("$@")
+  bash $YOZORA_PATH/os/arch/tools/has-package.sh "${args[@]}"
+}
+
+# Custom git clone function
+# use with --user <user> --host <host> --is_ssh <is_ssh> --target_dir <target_dir>
+gclone() {
+  usage() {
+    echo "usage: gclone <repo> [--user|-u] <user> [--host|-h] <host> [--is_ssh] <true|false> [--recursive|-r] [--target_dir|-t] <target_dir>"
+  }
+  # Parse the arguments in switch case
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    "--user" | "-u")
+      user=${2}
+      shift
+      shift
+      ;;
+    "--host" | "-h")
+      host=$2
+      shift
+      shift
+      ;;
+    "--is_ssh")
+      is_ssh=$2
+      shift
+      shift
+      ;;
+    "--target_dir" | "-t")
+      target_dir=$2
+      shift
+      shift
+      ;;
+    "--recursive" | "-r")
+      recursive="--recursive"
+      shift
+      ;;
+    "--help")
+      usage
+      return 0
+      ;;
+    *)
+      repo=$1
+      shift
+      ;;
+    esac
+  done
+
+  user=${user:-"$(whoami)"}
+  host=${host:-"github.com"}
+  is_ssh=${is_ssh:-"true"}
+  target_dir=${target_dir:-""}
+  recursive=${recursive:-""}
+
+  if [[ -z $user ]]; then
+    echo "No user or global user specified"
+    usage
+    return 1
+  fi
+
+  if [[ -z $repo ]]; then
+    echo "No repository specified"
+    usage
+    return 1
+  fi
+
+  if [[ $is_ssh == "true" ]]; then
+    command="git clone $recursive git@$host:$user/$repo.git $target_dir"
+  else
+    command="git clone $recursive https://$host/$user/$repo.git $target_dir"
+  fi
+
+  echo "Using: $command"
+  eval $command
+}

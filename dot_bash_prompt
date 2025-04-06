@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# if [ "`whoami`" = "root" ]; then
+#     lpath="/root/bin"
+#     User=$'\[\e[31;40m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]'
+# else
+#     lpath="/home/`whoami`/bin"
+#     User=$'\[\e[32m\]\u\[\e[0m\]@\[\e[36m\]\h\[\e[0m\]'
+# fi
+
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+else
+	color_prompt=
+fi
+
+# See: http://aperiodic.net/screen/title_examples#setting_the_title_to_the_name_of_the_running_program
+case $TERM in screen*)
+	PS1=${PS1}'\[\033k\033\\\]'
+	;;
+esac
+
+GIT_PROMPT=$YOZORA_PATH/os/scripts/git-prompt.sh
+[ -f $GIT_PROMPT ] && source $GIT_PROMPT
+
+get_git_branch() {
+	if [ -f $GIT_PROMPT ]; then
+		res=$(__git_ps1)
+		echo -n "$res"
+	else
+		echo -n "(no git file)"
+	fi
+}
+
+# Define colors (foreground and background pairs)
+USER_FG="\[\e[38;5;190m\]" # #BAFB00 (User text color)
+USER_BG="\[\e[48;5;190m\]" # #BAFB00 (User background)
+
+HOST_FG="\[\e[38;5;147m\]" # #9CA0ED (Host text color)
+HOST_BG="\[\e[48;5;147m\]" # #9CA0ED (Host background)
+
+PINK_FG="\[\e[38;5;217m\]" # #FF9D9B (Git branch text color)
+PINK_BG="\[\e[48;5;217m\]" # #FF9D9B (Git branch text color)
+
+YELLOW_BG="\[\e[48;5;136m\]" # #B58900
+YELLOW_FG="\[\e[38;5;136m\]" # #B58900
+WHITE_FG="\[\e[38;5;230m\]"  # #FDF6E3
+
+RESET="\[\e[0m\]"
+
+# Powerline-style prompt with color transitions
+# 
+
+# at_home=$([ "$(pwd)" = "$HOME" ] && echo "@home" || echo "")  # TODO: Fix to refresh after each dir change like git branch
+at_home=""
+
+PS1="${WHITE_FG}${YELLOW_BG} \w $at_home${RESET}${YELLOW_FG}${RESET}${PINK_FG}\$(get_git_branch)${RESET} > "
+
+export PS1
