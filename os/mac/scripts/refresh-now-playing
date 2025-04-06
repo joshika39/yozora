@@ -1,6 +1,0 @@
-#!/bin/bash
-
-pkill nowplaying-cli
-cd "/Users/joshika39/Library/Application Support/Übersicht/widgets/UeberPpyer.widget/lib"
-nohup ./nowplaying-cli >/dev/null 2>&1 &
-
