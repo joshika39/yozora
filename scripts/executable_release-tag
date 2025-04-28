@@ -16,7 +16,7 @@ git pull "$remote" master
 tag=$(date +%Y.%-m%d.0)
 
 i=0
-until git tag "$tag"; do
+until git tag -a "$tag" -m "Release $tag"; do
 	((i = i + 1))
 	tag=$(date +%Y.%-m%d.$i)
 done

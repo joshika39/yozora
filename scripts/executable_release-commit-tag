@@ -15,7 +15,7 @@ commit_date=$(git show -s --format=%ad --date=format:%Y.%-m%d)
 i=0
 tag="$commit_date.$i"
 
-until git tag "$tag"; do
+until git tag -a "$tag" -m "Release $tag"; do
 	((i = i + 1))
 	tag="$commit_date.$i"
 done
