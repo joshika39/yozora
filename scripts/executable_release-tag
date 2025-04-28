@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Usage: ./tag-by-current-date.sh [remote-name]
+# Default remote is 'upstream' if none given
+
+remote=${1:-upstream}
+
+if ! git remote get-url "$remote" &>/dev/null; then
+	echo "Error: Remote '$remote' does not exist."
+	exit 1
+fi
+
+git checkout -f master
+git pull "$remote" master
+
+tag=$(date +%Y.%-m%d.0)
+
+i=0
+until git tag "$tag"; do
+	((i = i + 1))
+	tag=$(date +%Y.%-m%d.$i)
+done
+
+git push "$remote" "$tag"
+
+echo "Created and pushed tag '$tag' to remote '$remote'."
