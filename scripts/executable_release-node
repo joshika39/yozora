@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "❌ Git working directory is dirty. Please commit or stash your changes."
+  exit 1
+fi
+
+LATEST_TAG=$(git describe --tags --abbrev=0)
+if [ -z "$LATEST_TAG" ]; then
+  echo "❌ No Git tag found. Please create one first."
+  exit 1
+fi
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+jq ".version = \"$LATEST_TAG\"" package.json > package.json.tmp && mv package.json.tmp package.json
+
+git add package.json
+git commit -m "chore(release): bump version to $LATEST_TAG"
+git push origin "$CURRENT_BRANCH"
+
+echo "✅ package.json updated to $LATEST_TAG and pushed to $CURRENT_BRANCH."
