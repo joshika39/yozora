@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Usage: zip-project /path/to/folder output.zip
+
+if [ "$#" -ne 2 ]; then
+	echo "Usage: $0 /path/to/folder output.zip"
+	exit 1
+fi
+
+SOURCE_FOLDER="$1"
+OUTPUT_ZIP="$2"
+
+zip -r "$OUTPUT_ZIP" "$SOURCE_FOLDER" \
+	-x "*/.git/*" \
+	-x "*/node_modules/*" \
+	-x "*/vendor/*" \
+	-x "*/.env" \
+	-x "*/.env.local"
+
+echo "Created $OUTPUT_ZIP excluding .git, node_modules, vendor, .env, and .env.local."
