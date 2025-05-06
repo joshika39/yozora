@@ -42,3 +42,5 @@ rdp() {
 }
 
 unset color_prompt force_color_prompt
+
+eval "$(starship init bash)"
