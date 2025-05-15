@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Toggle React DevTools
+# @reycast.description Toggles React DevTools turning it on or off in the background
+# @raycast.mode silent
+
+# Documentation:
+# @raycast.author joshika39
+# @raycast.authorURL https://raycast.com/joshika39
+
+if pgrep -x "React DevTools" >/dev/null; then
+	pkill -x "React DevTools"
+else
+	nohup open -a "React DevTools" >/dev/null 2>&1 &
+fi
