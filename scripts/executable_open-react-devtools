@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Open React DevTools
+# @raycast.mode silent
+
+# Documentation:
+# @raycast.author joshika39
+# @raycast.authorURL https://raycast.com/joshika39
+
+nohup react-devtools >/dev/null 2>&1 &
