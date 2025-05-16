@@ -10,8 +10,13 @@
 # @raycast.author joshika39
 # @raycast.authorURL https://raycast.com/joshika39
 
+if ! command -v react-devtools &>/dev/null; then
+	echo "React DevTools is not installed. Please install it using 'npm install -g react-devtools'."
+	exit 1
+fi
+
 if pgrep -x "React DevTools" >/dev/null; then
 	pkill -x "React DevTools"
 else
-	nohup open -a "React DevTools" >/dev/null 2>&1 &
+	nohup react-devtools >/dev/null 2>&1 &
 fi
