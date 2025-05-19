@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -euo pipefail
+
+git pull --rebase
+git add .
+
+changed_files=$(git diff --cached --name-only)
+
+if [[ -z "$changed_files" ]]; then
+  echo "No changes to commit."
+  exit 0
+fi
+
+file_list=$(echo "$changed_files" | paste -sd, - | tr -d '\n')
+message="sync notes: $file_list"
+
+if [[ ${#message} -gt 60 ]]; then
+  message="${message:0:57}..."
+fi
+
+git commit -m "$message"
+git push
