@@ -1,25 +1,19 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 set -euo pipefail
 
 git pull --rebase
-git add .
 
-changed_files=$(git diff --cached --name-only)
+git add .obsidian
 
-if [[ -z "$changed_files" ]]; then
-	echo "No changes to commit."
-	exit 0
-fi
-
-obsidian_files=$(echo "$changed_files" | grep '^\.obsidian/' || true)
-note_files=$(echo "$changed_files" | grep -v '^\.obsidian/' || true)
-
-if [[ -n "$obsidian_files" ]]; then
+obsidian_staged=$(git diff --cached --name-only | grep '^\.obsidian/' || true)
+if [[ -n "$obsidian_staged" ]]; then
 	git commit -S -m "syncing obsidian settings"
 fi
 
-if [[ -n "$note_files" ]]; then
+git add .
+
+remaining_staged=$(git diff --cached --name-only | grep -v '^\.obsidian/' || true)
+if [[ -n "$remaining_staged" ]]; then
 	git commit -S -m "syncing notes"
 fi
 
