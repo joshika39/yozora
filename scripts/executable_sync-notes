@@ -13,8 +13,10 @@ fi
 git add .
 
 remaining_staged=$(git diff --cached --name-only | grep -v '^\.obsidian/' || true)
+
 if [[ -n "$remaining_staged" ]]; then
-	git commit -S -m "syncing notes"
+	file_count=$(echo "$remaining_staged" | wc -l | tr -d ' ')
+	git commit -S -m "syncing notes ($file_count)"
 fi
 
 git push
