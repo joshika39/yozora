@@ -8,16 +8,19 @@ git add .
 changed_files=$(git diff --cached --name-only)
 
 if [[ -z "$changed_files" ]]; then
-  echo "No changes to commit."
-  exit 0
+	echo "No changes to commit."
+	exit 0
 fi
 
-file_list=$(echo "$changed_files" | paste -sd, - | tr -d '\n')
-message="sync notes: $file_list"
+obsidian_files=$(echo "$changed_files" | grep '^\.obsidian/' || true)
+note_files=$(echo "$changed_files" | grep -v '^\.obsidian/' || true)
 
-if [[ ${#message} -gt 60 ]]; then
-  message="${message:0:57}..."
+if [[ -n "$obsidian_files" ]]; then
+	git commit -S -m "syncing obsidian settings"
 fi
 
-git commit -m "$message"
+if [[ -n "$note_files" ]]; then
+	git commit -S -m "syncing notes"
+fi
+
 git push
