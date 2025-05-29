@@ -58,6 +58,7 @@ cask "transmit"
 cask "ubersicht"
 cask "viscosity"
 cask "readdle-spark"
+cask "yaak"
 mas "Endel", id: 1346247457
 mas "GarageBand", id: 682658836
 mas "Hush", id: 1544743900
