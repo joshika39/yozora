@@ -1,7 +1,7 @@
 #!/bin/bash
 
 current_spaces=$(yabai -m query --spaces | jq length)
-target_spaces=12
+target_spaces=${1:-10}
 
 while [ "$current_spaces" -lt "$target_spaces" ]; do
 	yabai -m space --create

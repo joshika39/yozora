@@ -2,14 +2,14 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Prepare for streaming
+# @raycast.title Prepare for work
 # @raycast.mode silent
 
 # Documentation:
 # @raycast.author joshika39
 # @raycast.authorURL https://raycast.com/joshika39
 
-./$HOME/scripts/create-spaces.sh 12
+bash $HOME/scripts/create-spaces.sh
 
 echo "Killing unnecessary apps..."
 
@@ -18,10 +18,5 @@ pkill -x "Keychain Access"
 pkill -x Things3
 pkill -x Obsidian
 
-sh ~/.config/yabai/rules/streaming
-sh ~/.config/yabai/rules/streaming apply
-
-# Start streaming apps (OBS, Audio Hijack, etc)
-open ~/Applications/keyCastr.app
-#open ~/Applications/Audio\ Hijack.app
-open ~/Applications/Ubersicht.app
+sh ~/.config/yabai/rules/work
+sh ~/.config/yabai/rules/work apply
