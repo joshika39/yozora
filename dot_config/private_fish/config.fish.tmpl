@@ -1,8 +1,9 @@
 fish_add_path $HOME/scripts
+
+{{ if eq .chezmoi.os "darwin" -}}
 fish_add_path /usr/local/sbin
 fish_add_path /opt/homebrew/bin
-#fish_add_path $HOME/Projects/yabai/bin
-#fish_add_path $HOME/Projects/skhd/bin
+{{ end -}}
 
 if type -q starship
     eval (starship init fish)
@@ -15,7 +16,11 @@ fish_vi_key_bindings
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
+{{ if eq .chezmoi.os "darwin" -}}
 export XDG_CONFIG_HOME="/Users/joshika39/.config/"
+{{ else if eq .chezmoi.os "linux" -}}
+export XDG_CONFIG_HOME="$HOME/.config"
+{{ end -}}
 
 export TERM=screen-256color
 
