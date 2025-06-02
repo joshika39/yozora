@@ -1,4 +1,4 @@
-command: "osascript ~/scripts/next-task.applescript"
+command: "osascript ~/scripts/darwin/next-task.applescript"
 refreshFrequency: 1000
 
 style: """
