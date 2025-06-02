@@ -1,6 +1,7 @@
 fish_add_path $HOME/scripts
 
 {{ if eq .chezmoi.os "darwin" -}}
+fish_add_path $HOME/scripts/darwin
 fish_add_path /usr/local/sbin
 fish_add_path /opt/homebrew/bin
 {{ end -}}
