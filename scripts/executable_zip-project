@@ -13,6 +13,8 @@ OUTPUT_ZIP="$2"
 zip -r "$OUTPUT_ZIP" "$SOURCE_FOLDER" \
 	-x "*/.git/*" \
 	-x "*/node_modules/*" \
+	-x "**/node_modules/*" \
+	-x "*.github/*" \
 	-x "*/vendor/*" \
 	-x "*/.idea/*" \
 	-x "*.vscode/*" \
