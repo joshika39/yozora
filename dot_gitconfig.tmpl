@@ -14,7 +14,7 @@
 [user]
   email = josh.hegedus@outlook.com
 	name = Joshua Hegedus
-	signingkey = /Users/joshika39/.ssh/id_ecdsa_sk_git.pub
+  signingkey = ~/.ssh/id_ecdsa_sk_git.pub
 [merge]
 	tool = kdiff3
 	conflictstyle = diff3
@@ -99,4 +99,8 @@
 [commit]
 	gpgsign = true
 [gpg "ssh"]
-	program = /opt/homebrew/bin/ssh-keygen
+{{- if eq .chezmoi.os "darwin" }}
+  program = /opt/homebrew/bin/ssh-keygen
+{{- else }}
+  program = /bin/ssh-keygen
+{{- end }}
