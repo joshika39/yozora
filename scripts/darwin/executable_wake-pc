@@ -19,12 +19,12 @@ fi
 
 HOST="${WOL_HOST:-}"
 MAC="${WOL_MAC:-}"
-SSH_OPTS=${WOL_SSH_OPTS:-"-o BatchMode=yes -o ConnectTimeout=8"}
+SSH_OPTS=${WOL_SSH_OPTS:-"-o IdentitiesOnly=yes -o ConnectTimeout=20"}
 
 usage() {
 	echo "Usage: $0 [-h host] [-m mac] [-n]"
-	echo "  -h host   SSH host (default/env: WOL_HOST -> ${HOST})"
-	echo "  -m mac    MAC address (default/env: WOL_MAC -> ${MAC})"
+	echo "  -h host   SSH host (env WOL_HOST)"
+	echo "  -m mac    MAC address (env WOL_MAC)"
 	echo "  -n        dry-run (print the command only)"
 	exit 64
 }
@@ -39,16 +39,14 @@ while getopts ":h:m:n" opt; do
 	esac
 done
 
-if [[ -z "${HOST}" ]]; then
+if [[ -z "$HOST" ]]; then
 	echo "Error: missing host. Set WOL_HOST or pass -h." >&2
 	usage
 fi
-
-if [[ -z "${MAC}" ]]; then
+if [[ -z "$MAC" ]]; then
 	echo "Error: missing MAC. Set WOL_MAC or pass -m." >&2
 	usage
 fi
-
 if [[ ! "$MAC" =~ ^([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}$ ]]; then
 	echo "Error: MAC must look like aa:bb:cc:dd:ee:ff" >&2
 	exit 64
