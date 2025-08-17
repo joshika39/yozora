@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title turn pc on
+# @raycast.mode compact
+
+# Documentation:
+# @raycast.author joshika39
+# @raycast.authorURL https://raycast.com/joshika39
+
+set -Eeuo pipefail
+
+if [[ -f .env ]]; then
+	set -a
+	source .env
+	set +a
+fi
+
+HOST="${WOL_HOST:-}"
+MAC="${WOL_MAC:-}"
+SSH_OPTS=${WOL_SSH_OPTS:-"-o BatchMode=yes -o ConnectTimeout=8"}
+
+usage() {
+	echo "Usage: $0 [-h host] [-m mac] [-n]"
+	echo "  -h host   SSH host (default/env: WOL_HOST -> ${HOST})"
+	echo "  -m mac    MAC address (default/env: WOL_MAC -> ${MAC})"
+	echo "  -n        dry-run (print the command only)"
+	exit 64
+}
+
+DRYRUN=0
+while getopts ":h:m:n" opt; do
+	case "$opt" in
+	h) HOST="$OPTARG" ;;
+	m) MAC="$OPTARG" ;;
+	n) DRYRUN=1 ;;
+	*) usage ;;
+	esac
+done
+
+if [[ -z "${HOST}" ]]; then
+	echo "Error: missing host. Set WOL_HOST or pass -h." >&2
+	usage
+fi
+
+if [[ -z "${MAC}" ]]; then
+	echo "Error: missing MAC. Set WOL_MAC or pass -m." >&2
+	usage
+fi
+
+if [[ ! "$MAC" =~ ^([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}$ ]]; then
+	echo "Error: MAC must look like aa:bb:cc:dd:ee:ff" >&2
+	exit 64
+fi
+
+command -v ssh >/dev/null || {
+	echo "ssh not found"
+	exit 127
+}
+
+CHECK_CMD='command -v wakeonlan >/dev/null || { echo "wakeonlan not installed on remote" >&2; exit 127; }'
+REMOTE_CMD="$CHECK_CMD && wakeonlan \"$MAC\""
+
+if [[ "$DRYRUN" -eq 1 ]]; then
+	echo "ssh $SSH_OPTS \"$HOST\" \"$REMOTE_CMD\""
+	exit 0
+fi
+
+ssh $SSH_OPTS "$HOST" "$REMOTE_CMD"
+echo "Sent magic packet for $MAC via $HOST."
