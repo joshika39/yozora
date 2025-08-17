@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title turn pc off
+# @raycast.mode compact
+
+# Documentation:
+# @raycast.author joshika39
+# @raycast.authorURL https://raycast.com/joshika39
+
+set -Eeuo pipefail
+
+if [[ -f .env ]]; then
+	set -a
+	source .env
+	set +a
+fi
+
+HOST="${POWEROFF_HOST:-}"
+SSH_OPTS=${SSH_OPTS:-"-o IdentitiesOnly=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new"}
+POWEROFF_PATH=${POWEROFF_PATH:-poweroff}
+
+if [[ -z "$HOST" ]]; then
+	echo "Error: missing host. Set POWEROFF_HOST." >&2
+	usage
+fi
+
+ssh -t $SSH_OPTS "$HOST" "sudo -n $POWEROFF_PATH || sudo $POWEROFF_PATH"
