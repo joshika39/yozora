@@ -294,7 +294,7 @@ export const init = (dispatch) => {
   );
 };
 
-export const command = "cat UeberPpyer.widget/lib/track";
+export const command = "/opt/homebrew/bin/media-control get";
 
 export const initialState = {
   app: "", // Current music software being used
@@ -371,38 +371,37 @@ export const updateState = ({ type, output, error }, previousState) => {
 
 // Update song metadata
 const updateSongData = (output, error, previousState) => {
-  // Check for errors
   if (error) {
-    const err_output = { ...previousState, error: error };
+    const err_output = { ...previousState, error };
     console.error(err_output);
     return err_output;
   }
 
-  // Extract & parse applescript output
-  let [
-    playing,
-    app,
-    track,
-    artist,
-    album,
-    artworkURL,
-    artworkFilename,
-    duration,
-    elapsed,
-    appleMusicError,
-  ] = output.trim().split("\n");
+  const data = JSON.parse(output);
 
-  playing = playing === "true";
-  appleMusicError = false;
-  duration = Math.floor(parseFloat(duration));
-  elapsed = Math.floor(parseFloat(elapsed));
+  if (!data) return previousState;
 
-  // State controller
+  const playing = data.playing;
+  const app = data.bundleIdentifier;
+  const track = data.title;
+  const artist = data.artist;
+  const album = data.album;
+  const appleMusicError = false;
+  const duration = data.duration;
+  const timeDiff = Date.now() - new Date(data.timestamp).getTime();
+  let elapsed = data.elapsedTime;
+  if (data.playing) {
+    elapsed += timeDiff / 1000;
+  }
+  let localArtwork = null;
+  if (data.artworkMimeType) {
+    localArtwork = `data:${data.artworkMimeType};base64,${data.artworkData}`;
+  }
   if (
-    track !== previousState.song.track ||
-    album !== previousState.song.album
+    (localArtwork && !previousState?.song.localArtwork) ||
+    track !== previousState?.song.track ||
+    album !== previousState?.song.album
   ) {
-    // Song change
     return {
       ...previousState,
       app,
@@ -413,14 +412,12 @@ const updateSongData = (output, error, previousState) => {
         track,
         artist,
         album,
-        localArtwork: `UeberPpyer.widget/cache/${artworkFilename}`,
-        onlineArtwork: artworkURL,
+        localArtwork,
         duration,
         elapsed,
       },
     };
   } else {
-    // Currently playing
     return {
       ...previousState,
       app,
