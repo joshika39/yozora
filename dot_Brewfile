@@ -51,7 +51,7 @@ cask "obs"
 cask "osu"
 cask "pixelsnap"
 cask "raycast"
-cask "stats"
+#cask "stats"
 cask "slidepad"
 cask "topnotch"
 cask "the-unarchiver"
@@ -63,12 +63,12 @@ cask "yaak"
 mas "Endel", id: 1346247457
 mas "GarageBand", id: 682658836
 mas "Hush", id: 1544743900
-#mas "iMovie", id: 408981434
+mas "iMovie", id: 408981434
 #mas "Jump Desktop", id: 524141863
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
-#mas "Pixelmator Pro", id: 1289583905
+mas "Pixelmator Pro", id: 1289583905
 mas "Things", id: 904280696
 mas "Userscripts-Mac-App", id: 1463298887
 #mas "Xcode", id: 497799835
