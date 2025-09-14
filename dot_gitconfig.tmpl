@@ -1,16 +1,11 @@
-[includeIf "gitdir:/Users/joshika39/uni/"]
-	path = ~/.gitconfig.uni
-[includeIf "gitdir:/Users/joshika39/work/"]
-  path = ~/.gitconfig.work
-
 [push]
 	default = tracking
 [core]
   ignorecase = false
 	excludesfile = ~/.gitignore
 	trustctime = false
-    autocrlf = false
-    safecrlf = false
+  autocrlf = false
+  safecrlf = false
 [user]
   email = josh.hegedus@outlook.com
 	name = Joshua Hegedus
@@ -19,7 +14,7 @@
 	tool = kdiff3
 	conflictstyle = diff3
 [mergetool "vscode"]
-    cmd = code --wait $MERGED
+  cmd = code --wait $MERGED
 
 [color]
 	ui = true
