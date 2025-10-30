@@ -1,36 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# sync-github
-# Sync all repositories from a GitHub user or organization into a local path.
-#
-# Requirements:
-#   - gh (GitHub CLI) logged in: `gh auth login`
-#   - git
-#   - jq
-#
-# Usage:
-#   sync-github (--user <username> | --org <org>) --dest <path> [options]
-#
-# Options:
-#   --user <username>         Sync repos for this user.
-#   --org <org>               Sync repos for this organization.
-#   --dest <path>             Destination directory for clones.
-#   --https                   Use HTTPS instead of SSH (default SSH).
-#   --mirror                  Use bare mirrored clones (<name>.git) and update via remote update.
-#   --include-archived        Include archived repositories (default: skip).
-#   --include-forks           Include forked repositories (default: skip).
-#   --concurrency <N>         Number of parallel sync jobs (default: 4).
-#   --dry-run                 Print what would be done without executing.
-#   --help                    Show help and exit.
-#
-# Examples:
-#   sync-github --org vercel --dest /backups/vercel
-#   sync-github --user torvalds --dest ~/code/torvalds --https
-#   sync-github --org my-co --dest /srv/mirror --mirror --include-archived --concurrency 8
-
 usage() {
-	sed -n '2,200p' "$0" | sed -n 's/^# \{0,1\}//p' | sed -n '1,200p'
+	cat <<'EOF'
+Usage:
+  sync-github (--user <username> | --org <org>) --dest <path> [options]
+
+Options:
+  --user <username>         Sync repos for this user.
+  --org <org>               Sync repos for this organization.
+  --dest <path>             Destination directory for clones.
+  --https                   Use HTTPS instead of SSH (default SSH).
+  --mirror                  Use bare mirrored clones (<name>.git).
+  --include-archived        Include archived repositories (default: skip).
+  --include-forks           Include forked repositories (default: skip).
+  --concurrency <N>         Parallel jobs (default: 4).
+  --dry-run                 Show actions only.
+  --help                    Show help.
+EOF
 	exit "${1:-0}"
 }
 
@@ -101,64 +88,58 @@ done
 	usage 1
 }
 
-command -v gh >/dev/null 2>&1 || {
-	echo "Error: gh not found. Install GitHub CLI."
+command -v gh >/dev/null || {
+	echo "Error: gh not found."
 	exit 1
 }
-command -v git >/dev/null 2>&1 || {
+command -v git >/dev/null || {
 	echo "Error: git not found."
 	exit 1
 }
-command -v jq >/dev/null 2>&1 || {
+command -v jq >/dev/null || {
 	echo "Error: jq not found."
 	exit 1
 }
-
-if ! gh auth status >/dev/null 2>&1; then
-	echo "Error: gh is not authenticated. Run: gh auth login"
+gh auth status >/dev/null || {
+	echo "Error: gh not authenticated. Run: gh auth login"
 	exit 1
-fi
+}
 
 mkdir -p "$DEST"
 
 echo ">> Listing repositories for $SUBJECT_TYPE: $SUBJECT_NAME ..."
 REPOS_JSON=$(gh repo list "$SUBJECT_NAME" --limit 1000 \
-	--json name,fullName,sshUrl,cloneUrl,archived,isFork,visibility 2>/dev/null)
+	--json name,sshUrl,url,isArchived,isFork,visibility 2>/dev/null)
 
-if [[ -z "$REPOS_JSON" || "$REPOS_JSON" == "null" ]]; then
-	echo "No repositories found or failed to list repos."
+[[ -z "${REPOS_JSON:-}" || "$REPOS_JSON" == "null" ]] && {
+	echo "No repositories found."
 	exit 1
-fi
+}
 
 URL_FIELD=".sshUrl"
-[[ "$USE_HTTPS" == "true" ]] && URL_FIELD=".cloneUrl"
+[[ "$USE_HTTPS" == "true" ]] && URL_FIELD=".url"
 
-JQ_FILTER='
+FILTERED=$(echo "$REPOS_JSON" | jq -r '
   map(
-    select(('"$INCLUDE_ARCHIVED"' or (.archived|not)))
+    select(('"$INCLUDE_ARCHIVED"' or (.isArchived|not)))
     | select(('"$INCLUDE_FORKS"' or (.isFork|not)))
   )
-  | map({name, fullName, url: ('"$URL_FIELD"'), archived, isFork, visibility})
-'
-
-FILTERED=$(echo "$REPOS_JSON" | jq -r "$JQ_FILTER")
+  | map({name, url: ('"$URL_FIELD"'), visibility})
+')
 
 COUNT=$(echo "$FILTERED" | jq 'length')
 echo ">> Repositories to sync: $COUNT (https="\"$USE_HTTPS\"" , mirror="\"$MIRROR\"" , include_archived="\"$INCLUDE_ARCHIVED\"" , include_forks="\"$INCLUDE_FORKS\"" )"
-
-if [[ "$COUNT" -eq 0 ]]; then
+[[ "$COUNT" -eq 0 ]] && {
 	echo "Nothing to do."
 	exit 0
-fi
+}
 
 LIST_FILE="$(mktemp)"
-echo "$FILTERED" | jq -r '.[] | [.name, .url, .visibility] | @tsv' >"$LIST_FILE"
+# NUL-delimited triplets: name \t url \t visibility \0
+echo "$FILTERED" | jq -r '.[] | [.name, .url, .visibility] | @tsv + "\u0000"' >"$LIST_FILE"
 
 sync_one_regular() {
-	local name="$1"
-	local url="$2"
-	local target="$3"
-
+	local name="$1" url="$2" target="$3"
 	if [[ ! -d "$target/.git" ]]; then
 		echo "  + Cloning $name -> $target"
 		git clone "$url" "$target"
@@ -175,9 +156,7 @@ sync_one_regular() {
 }
 
 sync_one_mirror() {
-	local name="$1"
-	local url="$2"
-	local target="$3"
+	local name="$1" url="$2" target="$3" # target ends with .git
 	if [[ ! -d "$target" ]]; then
 		echo "  + Mirroring $name -> $target"
 		git clone --mirror "$url" "$target"
@@ -188,41 +167,36 @@ sync_one_mirror() {
 	fi
 }
 
-export -f sync_one_regular
-export -f sync_one_mirror
-
-export DEST MIRROR DRY_RUN
-
 worker() {
-	IFS=$'\t' read -r name url visibility || exit 0
+	local name="$1" url="$2" visibility="$3"
 	local target
-
 	if [[ "$MIRROR" == "true" ]]; then
 		target="$DEST/${name}.git"
 	else
 		target="$DEST/${name}"
 	fi
-
 	echo ">> [$visibility] $name"
 	if [[ "$DRY_RUN" == "true" ]]; then
-		if [[ "$MIRROR" == "true" ]]; then
-			echo "    would: mirror clone/update $url -> $target"
-		else
-			echo "    would: clone/update $url -> $target"
-		fi
-		exit 0
+		[[ "$MIRROR" == "true" ]] && echo "    would: mirror clone/update $url -> $target" || echo "    would: clone/update $url -> $target"
+		return 0
 	fi
-
+	if [[ -z "$url" ]]; then
+		echo "    !! Skipping $name (empty URL)"
+		return 0
+	fi
 	if [[ "$MIRROR" == "true" ]]; then
 		sync_one_mirror "$name" "$url" "$target"
 	else
 		sync_one_regular "$name" "$url" "$target"
 	fi
 }
-export -f worker
+
+export -f sync_one_regular sync_one_mirror worker
+export DEST MIRROR DRY_RUN
 
 echo ">> Starting sync with concurrency=$CONCURRENCY ..."
-cat "$LIST_FILE" | xargs -I{} -P "$CONCURRENCY" bash -c 'echo -e "{}" | worker'
+# Read NUL-delimited records; pass 3 args (name url visibility) to worker
+xargs -0 -n3 -P "$CONCURRENCY" bash -c 'worker "$1" "$2" "$3"' _ <"$LIST_FILE"
 
 rm -f "$LIST_FILE"
 echo ">> Done."
