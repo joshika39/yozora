@@ -1,0 +1,228 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# sync-github
+# Sync all repositories from a GitHub user or organization into a local path.
+#
+# Requirements:
+#   - gh (GitHub CLI) logged in: `gh auth login`
+#   - git
+#   - jq
+#
+# Usage:
+#   sync-github (--user <username> | --org <org>) --dest <path> [options]
+#
+# Options:
+#   --user <username>         Sync repos for this user.
+#   --org <org>               Sync repos for this organization.
+#   --dest <path>             Destination directory for clones.
+#   --https                   Use HTTPS instead of SSH (default SSH).
+#   --mirror                  Use bare mirrored clones (<name>.git) and update via remote update.
+#   --include-archived        Include archived repositories (default: skip).
+#   --include-forks           Include forked repositories (default: skip).
+#   --concurrency <N>         Number of parallel sync jobs (default: 4).
+#   --dry-run                 Print what would be done without executing.
+#   --help                    Show help and exit.
+#
+# Examples:
+#   sync-github --org vercel --dest /backups/vercel
+#   sync-github --user torvalds --dest ~/code/torvalds --https
+#   sync-github --org my-co --dest /srv/mirror --mirror --include-archived --concurrency 8
+
+usage() {
+	sed -n '2,200p' "$0" | sed -n 's/^# \{0,1\}//p' | sed -n '1,200p'
+	exit "${1:-0}"
+}
+
+SUBJECT_TYPE=""
+SUBJECT_NAME=""
+DEST=""
+USE_HTTPS="false"
+MIRROR="false"
+INCLUDE_ARCHIVED="false"
+INCLUDE_FORKS="false"
+CONCURRENCY=4
+DRY_RUN="false"
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+	--user)
+		SUBJECT_TYPE="user"
+		SUBJECT_NAME="${2:?}"
+		shift 2
+		;;
+	--org)
+		SUBJECT_TYPE="org"
+		SUBJECT_NAME="${2:?}"
+		shift 2
+		;;
+	--dest)
+		DEST="${2:?}"
+		shift 2
+		;;
+	--https)
+		USE_HTTPS="true"
+		shift
+		;;
+	--mirror)
+		MIRROR="true"
+		shift
+		;;
+	--include-archived)
+		INCLUDE_ARCHIVED="true"
+		shift
+		;;
+	--include-forks)
+		INCLUDE_FORKS="true"
+		shift
+		;;
+	--concurrency)
+		CONCURRENCY="${2:?}"
+		shift 2
+		;;
+	--dry-run)
+		DRY_RUN="true"
+		shift
+		;;
+	--help | -h) usage 0 ;;
+	*)
+		echo "Unknown argument: $1"
+		usage 1
+		;;
+	esac
+done
+
+[[ -z "$SUBJECT_TYPE" || -z "$SUBJECT_NAME" ]] && {
+	echo "Error: --user or --org must be provided."
+	usage 1
+}
+[[ -z "$DEST" ]] && {
+	echo "Error: --dest <path> is required."
+	usage 1
+}
+
+command -v gh >/dev/null 2>&1 || {
+	echo "Error: gh not found. Install GitHub CLI."
+	exit 1
+}
+command -v git >/dev/null 2>&1 || {
+	echo "Error: git not found."
+	exit 1
+}
+command -v jq >/dev/null 2>&1 || {
+	echo "Error: jq not found."
+	exit 1
+}
+
+if ! gh auth status >/dev/null 2>&1; then
+	echo "Error: gh is not authenticated. Run: gh auth login"
+	exit 1
+fi
+
+mkdir -p "$DEST"
+
+echo ">> Listing repositories for $SUBJECT_TYPE: $SUBJECT_NAME ..."
+REPOS_JSON=$(gh repo list "$SUBJECT_NAME" --limit 1000 \
+	--json name,fullName,sshUrl,cloneUrl,archived,isFork,visibility 2>/dev/null)
+
+if [[ -z "$REPOS_JSON" || "$REPOS_JSON" == "null" ]]; then
+	echo "No repositories found or failed to list repos."
+	exit 1
+fi
+
+URL_FIELD=".sshUrl"
+[[ "$USE_HTTPS" == "true" ]] && URL_FIELD=".cloneUrl"
+
+JQ_FILTER='
+  map(
+    select(('"$INCLUDE_ARCHIVED"' or (.archived|not)))
+    | select(('"$INCLUDE_FORKS"' or (.isFork|not)))
+  )
+  | map({name, fullName, url: ('"$URL_FIELD"'), archived, isFork, visibility})
+'
+
+FILTERED=$(echo "$REPOS_JSON" | jq -r "$JQ_FILTER")
+
+COUNT=$(echo "$FILTERED" | jq 'length')
+echo ">> Repositories to sync: $COUNT (https="\"$USE_HTTPS\"" , mirror="\"$MIRROR\"" , include_archived="\"$INCLUDE_ARCHIVED\"" , include_forks="\"$INCLUDE_FORKS\"" )"
+
+if [[ "$COUNT" -eq 0 ]]; then
+	echo "Nothing to do."
+	exit 0
+fi
+
+LIST_FILE="$(mktemp)"
+echo "$FILTERED" | jq -r '.[] | [.name, .url, .visibility] | @tsv' >"$LIST_FILE"
+
+sync_one_regular() {
+	local name="$1"
+	local url="$2"
+	local target="$3"
+
+	if [[ ! -d "$target/.git" ]]; then
+		echo "  + Cloning $name -> $target"
+		git clone "$url" "$target"
+	else
+		echo "  ~ Updating $name in $target"
+		git -C "$target" remote set-url origin "$url" || true
+		git -C "$target" fetch --all --prune
+		if git -C "$target" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+			git -C "$target" pull --ff-only
+		else
+			echo "    (No upstream tracking branch; fetched only)"
+		fi
+	fi
+}
+
+sync_one_mirror() {
+	local name="$1"
+	local url="$2"
+	local target="$3"
+	if [[ ! -d "$target" ]]; then
+		echo "  + Mirroring $name -> $target"
+		git clone --mirror "$url" "$target"
+	else
+		echo "  ~ Updating mirror $name in $target"
+		git -C "$target" remote set-url origin "$url" || true
+		git -C "$target" remote update --prune
+	fi
+}
+
+export -f sync_one_regular
+export -f sync_one_mirror
+
+export DEST MIRROR DRY_RUN
+
+worker() {
+	IFS=$'\t' read -r name url visibility || exit 0
+	local target
+
+	if [[ "$MIRROR" == "true" ]]; then
+		target="$DEST/${name}.git"
+	else
+		target="$DEST/${name}"
+	fi
+
+	echo ">> [$visibility] $name"
+	if [[ "$DRY_RUN" == "true" ]]; then
+		if [[ "$MIRROR" == "true" ]]; then
+			echo "    would: mirror clone/update $url -> $target"
+		else
+			echo "    would: clone/update $url -> $target"
+		fi
+		exit 0
+	fi
+
+	if [[ "$MIRROR" == "true" ]]; then
+		sync_one_mirror "$name" "$url" "$target"
+	else
+		sync_one_regular "$name" "$url" "$target"
+	fi
+}
+export -f worker
+
+echo ">> Starting sync with concurrency=$CONCURRENCY ..."
+cat "$LIST_FILE" | xargs -I{} -P "$CONCURRENCY" bash -c 'echo -e "{}" | worker'
+
+rm -f "$LIST_FILE"
+echo ">> Done."
