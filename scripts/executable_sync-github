@@ -135,7 +135,6 @@ echo ">> Repositories to sync: $COUNT (https="\"$USE_HTTPS\"" , mirror="\"$MIRRO
 }
 
 LIST_FILE="$(mktemp)"
-# NUL-delimited triplets: name \t url \t visibility \0
 echo "$FILTERED" | jq -r '.[] | [.name, .url, .visibility] | @tsv + "\u0000"' >"$LIST_FILE"
 
 sync_one_regular() {
@@ -195,7 +194,6 @@ export -f sync_one_regular sync_one_mirror worker
 export DEST MIRROR DRY_RUN
 
 echo ">> Starting sync with concurrency=$CONCURRENCY ..."
-# Read NUL-delimited records; pass 3 args (name url visibility) to worker
 xargs -0 -n3 -P "$CONCURRENCY" bash -c 'worker "$1" "$2" "$3"' _ <"$LIST_FILE"
 
 rm -f "$LIST_FILE"
