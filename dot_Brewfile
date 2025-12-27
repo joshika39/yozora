@@ -63,9 +63,11 @@ cask "podman-desktop"
 cask "stats"
 cask "slidepad"
 cask "the-unarchiver"
+cask "tailscale-app"
 cask "transmit"
 cask "transmission"
 cask "ubersicht"
+cask "windscribe"
 
 mas "Endel", id: 1346247457
 mas "GarageBand", id: 682658836
