@@ -1,6 +1,8 @@
 tap "isen-ng/dotnet-sdk-versions"
 tap "koekeishiya/formulae"
 
+brew "awscli"
+brew "aws-amplify"
 brew "chezmoi"
 brew "choose-gui"
 brew "composer"
@@ -32,6 +34,7 @@ brew "watch"
 brew "zsh"
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
+
 cask "audio-hijack"
 cask "betterdisplay"
 cask "cleanshot"
@@ -57,12 +60,13 @@ cask "obsidian"
 cask "osu"
 cask "pixelsnap"
 cask "podman-desktop"
-cask "raycast"
 cask "stats"
 cask "slidepad"
 cask "the-unarchiver"
 cask "transmit"
+cask "transmission"
 cask "ubersicht"
+
 mas "Endel", id: 1346247457
 mas "GarageBand", id: 682658836
 mas "Hush", id: 1544743900
