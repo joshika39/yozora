@@ -4,3 +4,10 @@ bun = "latest"
 python = "3.13"
 elixir = "1.18.3-otp-27"
 erlang = "27.3.2"
+dotnet = "8"
+
+[hooks]
+postinstall = 'npx corepack enable'
+
+[settings]
+experimental = true
