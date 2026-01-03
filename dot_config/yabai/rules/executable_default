@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+
+COMMAND=${1:-add}
+FOLLOW=$(if [ "${COMMAND}" = "add" ]; then echo "^"; else echo ""; fi)
+
+yabai -m config external_bar main:0:0
+
+# space 2: web
+yabai -m rule --${COMMAND} app="Safari" space=${FOLLOW}2
+
+# space 4: jetbrains development | vscode
+JETBRAIN_APPS="JetBrains Rider.*|PhpStorm.*|WebStorm.*|IntelliJ IDEA.*|PyCharm.*"
+JETBRAIN_DIALOGS="Preferences|Settings|Rename|Add File to Git|Delete|Manage Licenses|Copy|Move|Refactor|Conflicts|Merge Revisions for.*"
+PYCHARM_DIALOGS="Creating Virtual Environments"
+yabai -m rule --${COMMAND} app="${JETBRAIN_APPS}" space=${FOLLOW}4
+yabai -m rule --${COMMAND} app="${JETBRAIN_APPS}" title="${JETBRAIN_DIALOGS}|${PYCHARM_DIALOGS}" space=${FOLLOW}4 manage=off
+yabai -m rule --${COMMAND} app="Visual Studio Code" space=${FOLLOW}4
+
+# space 5: todo and notes and brainstorming
+yabai -m rule --${COMMAND} app="Things" space=${FOLLOW}5
+yabai -m rule --${COMMAND} app="Notes" space=${FOLLOW}5
+yabai -m rule --${COMMAND} app="Freeform" space=${FOLLOW}5
+yabai -m rule --${COMMAND} app="Obsidian" space=${FOLLOW}5
+
+yabai -m rule --${COMMAND} app="Calendar" space=${FOLLOW}6
+
+yabai -m rule --${COMMAND} app="Microsoft Teams" space=${FOLLOW}6
+yabai -m rule --${COMMAND} app="Microsoft Teams" title="New meeting*" space=${FOLLOW}6 manage=off
+
+yabai -m rule --${COMMAND} app="OBS Studio" space=${FOLLOW}7
+
+yabai -m rule --${COMMAND} app="Discord|Discord PTB" space=${FOLLOW}8
+yabai -m rule --${COMMAND} app="Messages" space=${FOLLOW}8
+yabai -m rule --${COMMAND} app="Mail|メール" space=${FOLLOW}9
+yabai -m rule --${COMMAND} app="ミュージック|Spotify|Music" space=${FOLLOW}10
+
+yabai -m rule --${COMMAND} app="Loopback" space=${FOLLOW}12
+yabai -m rule --${COMMAND} app="Audio Hijack" space=${FOLLOW}12

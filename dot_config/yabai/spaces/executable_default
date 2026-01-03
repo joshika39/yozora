@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+need() { command -v "$1" >/dev/null 2>&1 || {
+	echo "Missing dependency: $1" >&2
+	exit 1
+}; }
+need yabai
+need jq
+
+display_count="$(yabai -m query --displays | jq 'length')"
+if [[ "$display_count" -lt 2 ]]; then
+	echo "Need at least 2 displays; found $display_count."
+	exit 1
+fi
+
+D1_INDEX=1
+D2_INDEX=2
+D3_INDEX=3
+
+D1_SPACES=10
+D2_SPACES=2
+D3_SPACES=0
+
+if [[ "$display_count" -ge 3 ]]; then
+	D1_SPACES=6
+	D2_SPACES=6
+	D3_SPACES=2
+fi
+
+TOTAL_SPACES=$((D1_SPACES + D2_SPACES + D3_SPACES))
+
+focused_display="$(yabai -m query --displays | jq -r '.[] | select(."has-focus"==true) | .index')"
+
+focus_display_if_needed() {
+	local target="$1"
+	if [[ "$focused_display" != "$target" ]]; then
+		yabai -m display --focus "$target" >/dev/null 2>&1 || true
+		focused_display="$target"
+	fi
+}
+
+ensure_total_spaces() {
+	local want="$1"
+	local have
+	have="$(yabai -m query --spaces | jq 'length')"
+
+	if [[ "$have" -lt "$want" ]]; then
+		echo "Have $have spaces; need $want. Creating $((want - have))..."
+		focus_display_if_needed "$D1_INDEX"
+		for ((i = have; i < want; i++)); do
+			yabai -m space --create
+		done
+	fi
+
+	have="$(yabai -m query --spaces | jq 'length')"
+	if [[ "$have" -lt "$want" ]]; then
+		echo "Still only $have spaces after creation; expected $want." >&2
+		exit 1
+	fi
+}
+
+label_for_index() {
+	local idx="$1"
+
+	if ((idx <= D1_SPACES)); then
+		printf 'd1-%02d' "$idx"
+	elif ((idx <= D1_SPACES + D2_SPACES)); then
+		printf 'd2-%02d' "$((idx - D1_SPACES))"
+	else
+		printf 'd3-%02d' "$((idx - D1_SPACES - D2_SPACES))"
+	fi
+}
+
+move_space_to_display_if_needed() {
+	local space_label="$1"
+	local target_display="$2"
+
+	local current_display
+	current_display="$(
+		yabai -m query --spaces |
+			jq -r --arg lbl "$space_label" '.[] | select(.label == $lbl) | .display'
+	)"
+
+	if [[ -z "$current_display" || "$current_display" == "null" ]]; then
+		echo "Could not find space with label: $space_label" >&2
+		exit 1
+	fi
+
+	if [[ "$current_display" != "$target_display" ]]; then
+		yabai -m space "$space_label" --display "$target_display" >/dev/null
+	fi
+}
+
+ensure_total_spaces "$TOTAL_SPACES"
+
+echo "Labelling spaces 1..$TOTAL_SPACES..."
+for ((idx = 1; idx <= TOTAL_SPACES; idx++)); do
+	lbl="$(label_for_index "$idx")"
+	yabai -m space "$idx" --label "$lbl" >/dev/null
+done
+
+echo "Moving spaces according to plan (displays=$display_count, total_spaces=$TOTAL_SPACES)..."
+
+echo " -> display $D1_INDEX: $D1_SPACES spaces"
+for ((idx = 1; idx <= D1_SPACES; idx++)); do
+	move_space_to_display_if_needed "$(label_for_index "$idx")" "$D1_INDEX"
+done
+
+echo " -> display $D2_INDEX: $D2_SPACES spaces"
+for ((idx = D1_SPACES + 1; idx <= D1_SPACES + D2_SPACES; idx++)); do
+	move_space_to_display_if_needed "$(label_for_index "$idx")" "$D2_INDEX"
+done
+
+if ((D3_SPACES > 0)); then
+	echo " -> display $D3_INDEX: $D3_SPACES spaces"
+	for ((idx = D1_SPACES + D2_SPACES + 1; idx <= TOTAL_SPACES; idx++)); do
+		move_space_to_display_if_needed "$(label_for_index "$idx")" "$D3_INDEX"
+	done
+fi
+
+echo "Done. Current distribution:"
+yabai -m query --spaces | jq -r '
+  sort_by(.index) |
+  .[] | "\(.index)\tlabel=\(.label)\tdisplay=\(.display)\tid=\(.id)"
+'

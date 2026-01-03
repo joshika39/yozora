@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+COMMAND=${1:-add}
+FOLLOW=$(if [ "${COMMAND}" = "add" ]; then echo "^"; else echo ""; fi)
+
+yabai -m config external_bar main:0:72
+
+[ -z "${FOLLOW}" ] && exit 0
+
+yabai -m rule --${COMMAND} app="OBS" space=${FOLLOW}7
+yabai -m rule --${COMMAND} app="Safari" title="personal*" space=${FOLLOW}12

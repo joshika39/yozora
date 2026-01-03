@@ -1,0 +1,96 @@
+# general window management
+alt - e : yabai -m window --toggle split
+alt - r : yabai -m space --rotate 90
+alt - t : yabai -m window --toggle float
+
+alt - d : yabai -m window --toggle zoom-parent
+alt - f : yabai -m window --toggle zoom-fullscreen
+
+alt - x : yabai -m window --close
+
+# resize window
+
+alt + shift - h : yabai -m window --resize left:5:0
+alt + shift - j : yabai -m window --resize bottom:0:5
+alt + shift - k : yabai -m window --resize top:0:5
+alt + shift - l : yabai -m window --resize right:5:0
+
+meh - h : yabai -m window --resize left:-5:0
+meh - j : yabai -m window --resize bottom:0:-5
+meh - k : yabai -m window --resize top:0:-5
+meh - l : yabai -m window --resize right:-5:0
+
+# focus display
+alt - y : ~/.config/skhd/scripts/focus-display-left.sh
+alt - u : ~/.config/skhd/scripts/focus-display-down.sh
+alt - i : ~/.config/skhd/scripts/focus-display-up.sh
+alt - o : ~/.config/skhd/scripts/focus-display-right.sh
+
+# focus window
+alt - h : yabai -m window --focus west || yabai -m window --focus stack.prev || yabai -m window --focus stack.last
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - l : yabai -m window --focus east || yabai -m window --focus stack.next || yabai -m window --focus stack.first
+
+ctrl - 1 : yabai -m space --focus 1
+ctrl - 2 : yabai -m space --focus 2
+ctrl - 3 : yabai -m space --focus 3
+ctrl - 4 : yabai -m space --focus 4
+ctrl - 5 : yabai -m space --focus 5
+ctrl - 6 : yabai -m space --focus 6
+ctrl - 7 : yabai -m space --focus 7
+ctrl - 8 : yabai -m space --focus 8
+ctrl - 9 : yabai -m space --focus 9
+
+# swap window
+alt + shift - h : yabai -m window --swap west
+alt + shift - j : yabai -m window --swap south
+alt + shift - k : yabai -m window --swap north
+alt + shift - l : yabai -m window --swap east
+
+# move window
+alt + ctrl - h : yabai -m window --warp west
+alt + ctrl - j : yabai -m window --warp south
+alt + ctrl - k : yabai -m window --warp north
+alt + ctrl - l : yabai -m window --warp east
+
+cmd + shift - h : yabai -m window --space prev --follow
+cmd + shift - l : yabai -m window --space next
+
+shift + ctrl - a : yabai -m window --move rel:-20:0
+shift + ctrl - s : yabai -m window --move rel:0:20
+
+# send window to monitor and follow focus
+alt - 1 : yabai -m window --display 1 --focus
+alt - 2 : yabai -m window --display 2 --focus
+alt - 3 : yabai -m window --display 3 --focus
+
+# general application and control hotkeys
+meh - tab : yabai -m space --focus recent
+
+# open spotlight from an iOS remote session
+
+# kill stream with meh-'
+meh - 0x27 : pkill OBS
+
+meh - backspace : pkill OBS; pmset displaysleepnow
+
+meh - a : yabai -m window --focus $(yabai -m query --windows |jq '.[] | select (.app  == "Audio Hijack") | .id');
+meh - d : yabai -m window --focus $(yabai -m query --windows |jq '.[] | select (.app  == "Discord") | .id');
+
+meh - m : yabai -m window --focus $(yabai -m query --windows |jq '.[] | select (.app  == "Spotify" or .app == "Music" or .app == "ミュージック") | .id');
+meh - e : yabai -m window --focus $(yabai -m query --windows |jq '.[] | select (.app  == "Spark Desktop" or .app == "Mail" or .app == "メール") | .id');
+
+meh - w : yabai -m window --focus $(yabai -m query --windows | jq -r '.[] | select(.app == "Safari" and (.title | strings | test("personal —.*"))) | .id');
+
+meh - o : yabai -m window --focus $(yabai -m query --windows | jq -r '.[] | select(.app == "OBS Studio") | .id');
+
+# open common folders
+meh - g : ~/scripts/github-safari-action
+
+# manage yabai
+meh - r : yabai --restart-service
+
+# change layout
+meh - 1 : ~/.config/yabai/rules/default && ~/.config/yabai/rules/default apply
+meh - 2 : ~/.config/yabai/rules/streaming && ~/.config/yabai/rules/streaming apply
