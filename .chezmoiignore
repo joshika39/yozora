@@ -12,6 +12,7 @@ backups/**
 **/.env.local
 
 {{- if ne .chezmoi.os "darwin" }}
+.iterm2/
 .Brewfile
 scripts/darwin/
 scripts/darwin/**

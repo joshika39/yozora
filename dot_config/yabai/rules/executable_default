@@ -5,6 +5,10 @@ FOLLOW=$(if [ "${COMMAND}" = "add" ]; then echo "^"; else echo ""; fi)
 
 yabai -m config external_bar main:0:0
 
+# space 1: terminals
+yabai -m rule --add app="iTerm2" space=^1
+yabai -m rule --add app="kitty" space=^1
+
 # space 2: web
 yabai -m rule --${COMMAND} app="Safari" space=${FOLLOW}2
 
