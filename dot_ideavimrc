@@ -32,6 +32,7 @@ map <Leader>i   <Action>(GotoImplementation)
 map <Leader>o   <Action>(ManageRecentProjects)
 map <Leader>p   <Action>(GotoAction)
 map <Leader>P   <Action>(TogglePresentationMode)
+map <Leader>D   <Action>(ToggleDistractionFreeMode)
 
 map <Leader>a   <Action>(XDebugger.AttachToProcess)
 map <Leader>A   <Action>(Annotate)
@@ -44,7 +45,10 @@ map <C-'>       <Action>(Run)
 
 map <Leader>b   <Action>(ToggleLineBreakpoint)
 map <Leader>B   <Action>(ViewBreakpoints)
-map <Leader>c   <Action>(Git.Commit.And.Push.Executor)
+nmap <Leader>Gp <Action>(Git.Commit.And.Push.Executor)
+nmap <leader>Gc <Action>(Vcs.Show.Local.Changes)
+nmap <leader>Gb <Action>(Git.Branches)
+nmap <leader>Gf <Action>(Git.Fetch)
 map <Leader>n   <Action>(RiderNuGetRestoreForceAction)
 map <Leader>l   <Action>(RestoreDefaultLayout)
 nmap ,          <Action>(ShowIntentionActions)
@@ -68,11 +72,12 @@ map <C-k> <Action>(ResizeToolWindowUp)
 nmap <Space> <C-D>
 nmap <S-Space> <C-U>
 
-# nmap <Enter> <Action>(RiderDebuggerApplyEncChagnes)
+" nmap <Enter> <Action>(RiderDebuggerApplyEncChagnes)
 
 map <Leader>wt <Action>(ActivateUnitTestsToolWindow)
 map <Leader>wd <Action>(ActivateDebugToolWindow)
 map <Leader>ws <Action>(ActivateProjectToolWindow)
+map <Leader>wt <Action>(ActivateTerminalToolWindow)
 map <Leader>we <Action>(Rider.ProblemsView.ErrorsInSolution)
 map <Leader>wi <Action>(NavigateToImmediateWindow)
 map <Leader>wr <Action>(ActivateRunToolWindow)
@@ -81,6 +86,7 @@ map <Leader>wp <Action>(ActivatedotTraceProfilerToolWindow)
 map <Leader>wc <Action>(ShowSolutionPropertiesAction)
 map <Leader>wn <Action>(ActivateNuGetToolWindow)
 map <Leader>ww <Action>(HideAllWindows)
+map <Leader>wq <Action>(HideSideWindows)
 map <Leader>wb <Action>(ViewStatusBar)
 
 " extract actions
@@ -116,6 +122,7 @@ nmap <C-i> <Action>(Forward)
 
 map gt   <Action>(SearchEverywhere)
 map gd   <Action>(GotoDeclaration)
+map gf   <Action>(GotoFile)
 
 " https://youtrack.jetbrains.com/issue/VIM-2178/multiple-cursors-defines-incorrect-keys
 " Remap multiple-cursors shortcuts to match terryma/vim-multiple-cursors
