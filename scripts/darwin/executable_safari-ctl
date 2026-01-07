@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+osascript <<'EOF'
+tell application "Safari"
+  if not (exists (front document)) then
+    return ""
+  end if
+
+  if (count of windows) is 0 then
+    return ""
+  end if
+
+  set w to front window
+  if (count of tabs of w) is 0 then
+    return ""
+  end if
+
+  try
+    set u to URL of current tab of w
+    if u is missing value then return ""
+    return u
+  on error
+    return ""
+  end try
+end tell
+EOF
