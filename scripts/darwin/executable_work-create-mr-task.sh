@@ -15,7 +15,7 @@
 set -euo pipefail
 
 MY_USERNAME="joshika39"
-THINGS_LIST_ID="CvRfq3p4a5eY3u3Wd8uwQ5"
+THINGS_LIST_ID="HLcSHt2UdiVVN1MhntVbp3"
 THINGS_TOKEN_SERVICE="things-url-auth-token"
 
 url="$(safari-ctl)"
@@ -169,6 +169,11 @@ assign_mr_to_me() {
 	glab api -X PUT "$endpoint" -f "assignee_id=$MY_USER_ID" >/dev/null
 }
 
+assign_issue_to_me() {
+	local endpoint="projects/$project_path_enc/issues/$issue_iid"
+	glab api -X PUT "$endpoint" -f "assignee_id=$MY_USER_ID" >/dev/null
+}
+
 add_me_as_reviewer() {
 	local endpoint="projects/$project_path_enc/merge_requests/$mr_iid"
 
@@ -213,7 +218,6 @@ if [[ "${1:-2}" -eq 1 ]]; then
 			add_me_as_reviewer
 		fi
 	else
-		glab api -X PUT "projects/$project_path_enc/issues/$issue_iid" \
-			-f "assignee_ids[]=$MY_USER_ID" >/dev/null || true
+		assign_issue_to_me
 	fi
 fi
