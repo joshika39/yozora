@@ -3,7 +3,7 @@
 # Required parameters:
 # @raycast.schemaVersion 1
 # @raycast.title Checkout or investigate GitLab work item
-# @raycast.mode fullOutput
+# @raycast.mode compact
 # @raycast.icon 🚚
 
 # Documentation:
