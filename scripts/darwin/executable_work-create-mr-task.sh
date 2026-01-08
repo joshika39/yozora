@@ -3,7 +3,7 @@
 # Required parameters:
 # @raycast.schemaVersion 1
 # @raycast.title Checkout or investigate GitLab work item
-# @raycast.mode compact
+# @raycast.mode fullOutput
 # @raycast.icon 🚚
 
 # Documentation:
@@ -12,24 +12,34 @@
 # @raycast.packageName Safari GitLab actions
 # @raycast.argument1 { "type": "dropdown", "placeholder": "Checkout", "data": [{"title": "Checkout", "value": "1"},{"title": "Just task", "value": "2"}] }
 
+set -euo pipefail
+
+MY_USERNAME="joshika39"
+THINGS_LIST_ID="CvRfq3p4a5eY3u3Wd8uwQ5"
+THINGS_TOKEN_SERVICE="things-url-auth-token"
+
 url="$(safari-ctl)"
+
+if [[ -z "$url" ]]; then
+	echo "Could not read Safari URL."
+	exit 1
+fi
 
 if [[ "$url" != https://gitlab.com/* ]]; then
 	echo "Not a valid GitLab tab!"
 	exit 1
 fi
 
-project_path="$(echo "$url" | sed -E 's#^https://gitlab\.com/([^/]+/[^/]+).*#\1#')"
-project_path="$(echo "$url" | sed -E 's#^https://gitlab\.com/(([^/]+/)+[^/]+)/-/(merge_requests|issues)/[0-9]+.*#\1#')"
+project_path="$(echo "$url" | sed -E 's#^https://gitlab\.com/##; s#(/-/(merge_requests|issues)/[0-9]+.*)$##')"
 
 if [[ -z "$project_path" || "$project_path" == "$url" ]]; then
 	echo "Could not determine project from URL!"
 	exit 1
 fi
 
-project_name="$(echo "$project_path" | awk -F/ '{print $NF}')"
+repo="$(echo "$project_path" | awk -F/ '{print $NF}')"
 
-cd "$HOME/Projects/$project_name/" >/dev/null 2>&1 || true
+cd "$HOME/Projects/$repo" >/dev/null 2>&1 || true
 
 project_path_enc="$(
 	P="$project_path" python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["P"], safe=""))'
@@ -40,8 +50,11 @@ get_user_id_by_username() {
 	glab api "users?username=$username" | jq -r '.[0].id'
 }
 
+MY_USER_ID="$(get_user_id_by_username "$MY_USERNAME")"
+
 mr_iid=""
 issue_iid=""
+
 if [[ "$url" == *"/-/merge_requests/"* ]]; then
 	mr_iid="$(echo "$url" | sed -E 's#^.*/-/merge_requests/([0-9]+).*#\1#')"
 elif [[ "$url" == *"/-/issues/"* ]]; then
@@ -53,8 +66,8 @@ fi
 
 number=""
 title=""
-created_at=""
 author=""
+created_at=""
 web_url="$url"
 
 if [[ -n "$mr_iid" ]]; then
@@ -65,12 +78,14 @@ if [[ -n "$mr_iid" ]]; then
 			jq '{iid: .iid, title: .title, url: .web_url, author: .author.username, created_at: .created_at}' |
 			jq -r '@sh "number=\(.iid)", @sh "title=\(.title)", @sh "web_url=\(.url)", @sh "author=\(.author)", @sh "created_at=\(.created_at)"'
 	)"
+
 	if [[ "$author" == *"joshika39"* ]]; then
-		pr_time="$(date -j -u -f "%Y-%m-%dT%H:%M:%SZ" "$created_at" +%s)"
+		created_at_sanitized="$(echo "$created_at" | sed -E 's/\.[0-9]+Z$/Z/')"
+		pr_time="$(date -j -u -f "%Y-%m-%dT%H:%M:%SZ" "$created_at_sanitized" +%s 2>/dev/null || echo 0)"
 		current_time="$(date +%s)"
 		time_diff=$((current_time - pr_time))
 
-		if [ "$time_diff" -le 64000 ]; then
+		if [[ "$pr_time" -ne 0 && "$time_diff" -le 64000 ]]; then
 			task_title="$title"
 		else
 			task_title="Fixup: $title"
@@ -81,7 +96,7 @@ if [[ -n "$mr_iid" ]]; then
 
 	task_notes="[gitlab $project_path!$number]($web_url)"
 
-elif [[ -n "$issue_iid" ]]; then
+else
 	issue_json="$(glab api "projects/$project_path_enc/issues/$issue_iid")"
 
 	eval "$(
@@ -102,8 +117,7 @@ task_id="$(
 tell application "Things3"
     set task_list to to dos whose name is "$task_title_escaped"
     if (count of task_list) > 0 then
-        set task_id to id of item 1 of task_list
-        return task_id
+        return id of item 1 of task_list
     else
         return "no"
     end if
@@ -111,26 +125,28 @@ end tell
 EOF
 )"
 
-auth_token="$(security find-generic-password -s "things-url-auth-token" -w 2>/dev/null || true)"
-
-focus="$(get-current-focus 2>/dev/null || true)"
-obs_running="$(pgrep -x OBS || true)"
-
-if [ -n "${obs_running:-}" ]; then
-	tag_param="&tags=Stream,Standup"
-else
-	tag_param="&tags=Standup"
+auth_token="$(security find-generic-password -s "$THINGS_TOKEN_SERVICE" -w 2>/dev/null || true)"
+if [[ -z "$auth_token" ]]; then
+	echo "Could not read Things auth token from Keychain (service: $THINGS_TOKEN_SERVICE)."
+	exit 1
 fi
 
-if [ "$task_id" != "no" ]; then
-	open "things:///update?id=$task_id&when=today$tag_param&list-id=CvRfq3p4a5eY3u3Wd8uwQ5&auth-token=$auth_token&completed=false"
+obs_running="$(pgrep -x OBS || true)"
+if [[ -n "${obs_running:-}" ]]; then
+	tag_param="&tags=%F0%9F%92%BC%20Work%2C%F0%9F%93%B7%20Sportograf%2C%F0%9F%93%B9%20Stream"
 else
-	open "things:///add?title=$(echo -n "$task_title" | jq -sRr @uri)&notes=$(echo -n "$task_notes" | jq -sRr @uri)&when=today$tag_param&list-id=CvRfq3p4a5eY3u3Wd8uwQ5&auth-token=$auth_token"
+	tag_param="&tags=%F0%9F%92%BC%20Work%2C%F0%9F%93%B7%20Sportograf"
+fi
+
+if [[ "$task_id" != "no" ]]; then
+	open "things:///update?id=$task_id&when=today$tag_param&list-id=$THINGS_LIST_ID&auth-token=$auth_token&completed=false"
+else
+	open "things:///add?title=$(echo -n "$task_title" | jq -sRr @uri)&notes=$(echo -n "$task_notes" | jq -sRr @uri)&when=today$tag_param&list-id=$THINGS_LIST_ID&auth-token=$auth_token"
 fi
 
 echo "Added task"
 
-osascript <<'EOF'
+osascript <<'EOF' >/dev/null 2>&1 || true
 tell application "System Events"
     tell application "Things3" to activate
     repeat until application "Things3" is frontmost
@@ -148,20 +164,56 @@ tell application "System Events"
 end tell
 EOF
 
-if [ "${1:-2}" -eq "1" ]; then
-	username="joshika39"
-	user_id="$(get_user_id_by_username "$username")"
+assign_mr_to_me() {
+	local endpoint="projects/$project_path_enc/merge_requests/$mr_iid"
+	glab api -X PUT "$endpoint" -f "assignee_id=$MY_USER_ID" >/dev/null
+}
 
+add_me_as_reviewer() {
+	local endpoint="projects/$project_path_enc/merge_requests/$mr_iid"
+
+	if glab api -X PUT "$endpoint" -f "reviewer_ids=$MY_USER_ID" >/dev/null 2>&1; then
+		return 0
+	fi
+
+	glab api -X PUT "$endpoint" \
+		-H "Content-Type: application/json" \
+		--raw-field "$(jq -c --argjson id "$MY_USER_ID" '{reviewer_ids: [$id] }')" \
+		>/dev/null
+}
+
+ensure_git_repo() {
+	local p1="$HOME/Projects/$repo"
+	local p2="$HOME/Projects/$project_path"
+	local p3="$HOME/Projects/gitlab.com/$project_path"
+
+	for p in "$p1" "$p2" "$p3"; do
+		if [[ -d "$p/.git" ]]; then
+			cd "$p"
+			return 0
+		fi
+	done
+
+	local target="$HOME/Projects/$project_path"
+	mkdir -p "$(dirname "$target")"
+	glab repo clone "$project_path" "$target"
+	cd "$target"
+}
+
+if [[ "${1:-2}" -eq 1 ]]; then
 	if [[ -n "$mr_iid" ]]; then
-		echo "$project_path"
+		ensure_git_repo
 		glab mr checkout "$mr_iid" -R "$project_path"
+
 		echo "Checked out !$number ($title)"
 
-		glab api -X PUT "projects/$project_path_enc/merge_requests/$mr_iid" -f "reviewer_ids[]=$user_id"
-
+		if [[ "$author" == "$MY_USERNAME" ]]; then
+			assign_mr_to_me
+		else
+			add_me_as_reviewer
+		fi
 	else
-		glab api -X PUT "projects/$project_path_enc/issues/$issue_iid" -f "reviewer_ids[]=$user_id"
+		glab api -X PUT "projects/$project_path_enc/issues/$issue_iid" \
+			-f "assignee_ids[]=$MY_USER_ID" >/dev/null || true
 	fi
-else
-	echo "Just creating a task"
 fi
