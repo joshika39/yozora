@@ -13,7 +13,6 @@ set quickscope
 " avoid accidental pagination while in insert mode (keymap woes).
 imap <PageUp> <Space>
 imap <PageDown> <Space>
-
 map <Leader>\   <Action>(Refactorings.QuickListPopupAction)
 map <Leader>e   <Action>(ReSharperGotoNextErrorInSolution)
 map <Leader>r   <Action>(ChooseRunConfiguration)
@@ -31,7 +30,8 @@ map <Leader>u   <Action>(GotoSuperMethod)
 map <Leader>i   <Action>(GotoImplementation)
 map <Leader>o   <Action>(ManageRecentProjects)
 map <Leader>p   <Action>(GotoAction)
-map <Leader>P   <Action>(TogglePresentationMode)
+map <Leader>pp   <Action>(TogglePresentationMode)
+map <Leader>pf  <Action>(ToggleFullScreen)
 map <Leader>D   <Action>(ToggleDistractionFreeMode)
 
 map <Leader>a   <Action>(XDebugger.AttachToProcess)
