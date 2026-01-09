@@ -8,7 +8,7 @@ set multiple-cursors
 set highlightedyank
 set quickscope
 
-" set clipboard+=unnamed
+set clipboard+=unnamed
 
 " avoid accidental pagination while in insert mode (keymap woes).
 imap <PageUp> <Space>
@@ -55,9 +55,9 @@ nmap ,          <Action>(ShowIntentionActions)
 
 nmap <Tab>      <Action>(ShowErrorDescription)
 imap <Tab>      <Action>(InsertInlineCompletionAction)
-" nmap <Esc>      <Action>(JumpToLastWindow)
+nmap <Esc>      <Action>(JumpToLastWindow)
 
-" TODO: find a key for this <Action>(QuickJavaDoc)
+map <Leader>I   <Action>(ShowHoverInfo)
 
 nmap ;    <Action>(AceAction)
 
