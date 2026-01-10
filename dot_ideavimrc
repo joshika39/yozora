@@ -18,6 +18,8 @@ map <Leader>e   <Action>(ReSharperGotoNextErrorInSolution)
 map <Leader>r   <Action>(ChooseRunConfiguration)
 map <Leader>R   <Action>(RenameElement)
 map <Leader>t   <Action>(SearchEverywhere)
+
+" Rider specific actions
 map <Leader>TC  <Action>(RiderUnitTestRunContextAction)
 map <Leader>TD  <Action>(RiderUnitTestDebugContextAction)
 map <Leader>TS  <Action>(RiderUnitTestNewSessionAction)
@@ -26,11 +28,13 @@ map <Leader>TU  <Action>(RiderUnitTestRunContextUntilFailAction)
 map <Leader>TT  <Action>(RiderUnitTestRunCurrentSessionAction)
 map <Leader>TR  <Action>(RiderUnitTestRunCurrentSessionAction)
 map <Leader>TA  <Action>(Rider.UnitTesting.RunSolution)
+" nmap <Enter> <Action>(RiderDebuggerApplyEncChagnes)
+"
 map <Leader>u   <Action>(GotoSuperMethod)
 map <Leader>i   <Action>(GotoImplementation)
 map <Leader>o   <Action>(ManageRecentProjects)
 map <Leader>p   <Action>(GotoAction)
-map <Leader>pp   <Action>(TogglePresentationMode)
+map <Leader>pp  <Action>(TogglePresentationMode)
 map <Leader>pf  <Action>(ToggleFullScreen)
 map <Leader>D   <Action>(ToggleDistractionFreeMode)
 
@@ -59,20 +63,18 @@ nmap <Esc>      <Action>(JumpToLastWindow)
 
 map <Leader>I   <Action>(ShowHoverInfo)
 
-nmap ;    <Action>(AceAction)
+nmap ;          <Action>(AceAction)
 
 map <Leader>,   :source ~/.ideavimrc<CR>
 map <Leader>.   :e ~/.ideavimrc<CR>
-map <C-h> <Action>(PreviousTab)
-map <C-l> <Action>(NextTab)
+map <C-h>       <Action>(PreviousTab)
+map <C-l>       <Action>(NextTab)
 
-map <C-j> <Action>(ResizeToolWindowDown)
-map <C-k> <Action>(ResizeToolWindowUp)
+map <C-j>       <Action>(ResizeToolWindowDown)
+map <C-k>       <Action>(ResizeToolWindowUp)
 
 nmap <Space> <C-D>
 nmap <S-Space> <C-U>
-
-" nmap <Enter> <Action>(RiderDebuggerApplyEncChagnes)
 
 map <Leader>wt <Action>(ActivateUnitTestsToolWindow)
 map <Leader>wd <Action>(ActivateDebugToolWindow)
