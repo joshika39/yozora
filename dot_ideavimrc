@@ -59,7 +59,7 @@ nmap ,          <Action>(ShowIntentionActions)
 
 nmap <Tab>      <Action>(ShowErrorDescription)
 imap <Tab>      <Action>(InsertInlineCompletionAction)
-nmap <Esc>      <Action>(JumpToLastWindow)
+nmap <Leader>qq <Action>(JumpToLastWindow)
 
 map <Leader>I   <Action>(ShowHoverInfo)
 
