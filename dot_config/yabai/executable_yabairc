@@ -36,6 +36,7 @@ yabai -m rule --add app="choose" manage=off mouse_follows_focus=off
 yabai -m rule --add app="CleanShot X" manage=off mouse_follows_focus=off
 yabai -m rule --add app="Raycast" title="Settings" manage=off mouse_follows_focus=off
 yabai -m rule --add app="Electron" manage=off mouse_follows_focus=off
+yabai -m rule --add app="Simulator" manage=off mouse_follows_focus=off
 
 # pygame popups
 yabai -m rule --add app="Python" manage=off mouse_follows_focus=off
