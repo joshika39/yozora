@@ -93,4 +93,5 @@ meh - r : yabai --restart-service
 
 # change layout
 meh - 1 : ~/.config/yabai/rules/default && ~/.config/yabai/rules/default apply
-meh - 2 : ~/.config/yabai/rules/streaming && ~/.config/yabai/rules/streaming apply
+meh - 2 : ~/.config/yabai/rules/work && ~/.config/yabai/rules/work apply
+meh - 3 : ~/.config/yabai/rules/streaming && ~/.config/yabai/rules/streaming apply

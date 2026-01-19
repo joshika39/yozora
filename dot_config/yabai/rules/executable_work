@@ -3,10 +3,13 @@
 COMMAND=${1:-add}
 FOLLOW=$(if [ "${COMMAND}" = "add" ]; then echo "^"; else echo ""; fi)
 
-yabai -m config external_bar main:0:72
-
 [ -z "${FOLLOW}" ] && exit 0
 
-yabai -m rule --${COMMAND} app="OBS" space=${FOLLOW}7
-yabai -m rule --${COMMAND} app="Safari" title="personal*" space=${FOLLOW}2
-yabai -m rule --${COMMAND} app="Safari" title="work*" space=${FOLLOW}3
+# space 3: web
+yabai -m rule --${COMMAND} app="Safari" title="personal*" space=${FOLLOW}3
+
+# space 6: todo and notes and brainstorming
+yabai -m rule --${COMMAND} app="Things" space=${FOLLOW}6
+yabai -m rule --${COMMAND} app="Notes" space=${FOLLOW}6
+yabai -m rule --${COMMAND} app="Freeform" space=${FOLLOW}6
+yabai -m rule --${COMMAND} app="Obsidian" space=${FOLLOW}6
