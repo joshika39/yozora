@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
-set -euo pipefail
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Refresh Spaces
+# @raycast.mode silent
+
+# Documentation:
+# @raycast.author joshika39
+# @raycast.authorURL https://raycast.com/joshika39
 
 need() { command -v "$1" >/dev/null 2>&1 || {
 	echo "Missing dependency: $1" >&2
