@@ -5,6 +5,8 @@ FOLLOW=$(if [ "${COMMAND}" = "add" ]; then echo "^"; else echo ""; fi)
 
 [ -z "${FOLLOW}" ] && exit 0
 
+yabai -m config external_bar main:0:0
+
 # space 3: web
 yabai -m rule --${COMMAND} app="Safari" title="personal*" space=${FOLLOW}3
 
