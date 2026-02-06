@@ -94,6 +94,11 @@ map <Leader>ww <Action>(HideAllWindows)
 map <Leader>wq <Action>(HideSideWindows)
 map <Leader>wb <Action>(ViewStatusBar)
 
+" copilot
+map <Leader>ce <Action>(copilot.enableCopilot)
+map <Leader>cd <Action>(copilot.disableCopilot)
+nmap ic <Action>(ToggleInlineHintsAction)
+
 " extract actions
 map <Leader>xi <Action>(ExtractInterface)
 map <Leader>xs <Action>(ExtractSuperclass)
