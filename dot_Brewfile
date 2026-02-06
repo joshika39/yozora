@@ -1,3 +1,5 @@
+# joshik39's Brewfile
+
 tap "isen-ng/dotnet-sdk-versions"
 tap "koekeishiya/formulae"
 
@@ -15,7 +17,7 @@ brew "gh"
 brew "git"
 brew "glab"
 brew "gnupg"
-brew "grource"
+brew "gource"
 brew "graphviz"
 brew "htop"
 brew "hub"
@@ -33,7 +35,7 @@ brew "ripgrep"
 brew "rtorrent"
 brew "starship"
 brew "tmux"
-grew "tree"
+brew "tree"
 brew "ollama"
 brew "watch"
 brew "zsh"
@@ -86,7 +88,9 @@ mas "Infuse", id: 1136220934
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
-mas "Pixelmator Pro", id: 1289583905
+# Commented out because Apple incuded it in their Creator Studio
+# mas "Pixelmator Pro", id: 1289583905
+mas "Pixelmator Pro: 画像編集", id: 6746662575
 mas "Things", id: 904280696
 mas "Userscripts-Mac-App", id: 1463298887
 mas "Xcode", id: 497799835
