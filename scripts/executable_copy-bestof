@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+[ $# -eq 1 ] || {
+	echo "Usage: $0 /Volumes/SDCARD_NAME"
+	exit 1
+}
+command -v exiftool >/dev/null || {
+	echo "Install exiftool: brew install exiftool"
+	exit 1
+}
+
+SRC="$1"
+DEST="$HOME/Pictures/Bestof"
+mkdir -p "$DEST"
+[ -d "$SRC" ] || {
+	echo "DCIM not found: $SRC"
+	exit 1
+}
+
+find "$SRC" -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -print0 |
+	while IFS= read -r -d '' f; do
+		stat -f "%Sf" "$f" | grep -Eq 'uchg|schg' || continue
+
+		ts="$(exiftool -s3 -d "%Y-%m-%d_%H-%M-%S" -DateTimeOriginal -CreateDate "$f" | head -n 1)"
+		[ -n "$ts" ] || ts="$(stat -f "%Sm" -t "%Y-%m-%d_%H-%M-%S" "$f")"
+
+		orig="$(basename "$f")"
+		orig="${orig%.*}"
+		ext="${f##*.}"
+
+		base="${ts}_${orig}"
+		out="$DEST/$base.$ext"
+		n=1
+		while [ -e "$out" ]; do
+			out="$DEST/${base}_$n.$ext"
+			n=$((n + 1))
+		done
+
+		echo "Copying: $f -> $(basename "$out")"
+		cp -f "$f" "$out"
+	done
+
+echo "Done."
