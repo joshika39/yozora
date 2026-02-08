@@ -4,10 +4,6 @@
 	echo "Usage: $0 /Volumes/SDCARD_NAME"
 	exit 1
 }
-command -v exiftool >/dev/null || {
-	echo "Install exiftool: brew install exiftool"
-	exit 1
-}
 
 SRC="$1"
 DEST="$HOME/Pictures/Bestof"
