@@ -114,6 +114,8 @@ map <Leader>cc <Action>(IntroduceConstant)
 nmap gr <Action>(GotoSuperMethod)
 nmap gb <Action>(GotoSuperMethod)
 nmap gu <Action>(ShowUsages)
+nmap ge <Action>(GotoNextError)
+nmap gE <Action>(GotoPreviousError)
 
 " comment a line, similar to tpope/vim-commentary
 nmap gcc <Action>(CommentByLineComment)
