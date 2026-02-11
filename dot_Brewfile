@@ -86,11 +86,9 @@ mas "Hush", id: 1544743900
 mas "iMovie", id: 408981434
 #mas "Jump Desktop", id: 524141863
 mas "Infuse", id: 1136220934
-mas "Keynote", id: 409183694
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
-# Commented out because Apple incuded it in their Creator Studio
-# mas "Pixelmator Pro", id: 1289583905
+#mas "Keynote", id: 409183694
+#mas "Numbers", id: 409203825
+#mas "Pages", id: 409201541
 mas "Pixelmator Pro: 画像編集", id: 6746662575
 mas "Things", id: 904280696
 mas "Userscripts-Mac-App", id: 1463298887
