@@ -1,7 +1,7 @@
 # joshik39's Brewfile
 
 tap "isen-ng/dotnet-sdk-versions"
-tap "koekeishiya/formulae"
+tap "asmvik/formulae"
 
 brew "awscli"
 brew "aws-amplify"
@@ -40,8 +40,8 @@ brew "tree"
 brew "ollama"
 brew "watch"
 brew "zsh"
-brew "koekeishiya/formulae/skhd"
-brew "koekeishiya/formulae/yabai"
+brew "asmvik/formulae/skhd"
+brew "asmvik/formulae/yabai"
 
 cask "audio-hijack"
 cask "betterdisplay"
