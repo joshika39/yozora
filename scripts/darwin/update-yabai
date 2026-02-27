@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export YABAI_CERT=yabai-cert
+
+yabai --stop-service
+
+yabai --uninstall-service
+brew reinstall asmvik/formulae/yabai
+codesign -fs "YABAI_CERT" "$(brew --prefix yabai)/bin/yabai"
+
+yabai --start-service
