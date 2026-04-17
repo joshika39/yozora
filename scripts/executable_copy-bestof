@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
 
-[ $# -eq 1 ] || {
-	echo "Usage: $0 /Volumes/SDCARD_NAME"
+[ $# -lt 1 ] && {
+	echo "Usage: $0 /Volumes/SDCARD_NAME [--folder NAME]"
 	exit 1
 }
 
-SRC="$1"
-DEST="$HOME/Pictures/Bestof"
+FOLDER_NAME=""
+SRC=""
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+	--folder)
+		FOLDER_NAME="/$2"
+		shift 2
+		;;
+	*)
+		SRC="$1"
+		shift
+		;;
+	esac
+done
+
+DEST="$HOME/Pictures/Bestof$FOLDER_NAME"
 mkdir -p "$DEST"
 [ -d "$SRC" ] || {
 	echo "DCIM not found: $SRC"
@@ -26,14 +41,13 @@ find "$SRC" -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -print0 |
 
 		base="${ts}_${orig}"
 		out="$DEST/$base.$ext"
-		n=1
-		while [ -e "$out" ]; do
-			out="$DEST/${base}_$n.$ext"
-			n=$((n + 1))
-		done
 
-		echo "Copying: $f -> $(basename "$out")"
-		cp -f "$f" "$out"
+		if [ -e "$out" ]; then
+			echo "$out already copied."
+		else
+			echo "Copying: $f -> $(basename "$out")"
+			cp -f "$f" "$out"
+		fi
 	done
 
 echo "Done."
