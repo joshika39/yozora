@@ -1,54 +1,132 @@
 #!/usr/bin/env python3
 
 import argparse
-from pathlib import Path
-import os
+import shutil
+import subprocess
 import sys
-from glob import glob
-
-from PIL import Image
-from PIL.ExifTags import TAGS, GPSTAGS
-
-def get_exif(path: str):
-    with Image.open(path) as img:
-        raw = img._getexif() or {}
-
-    exif = {TAGS.get(k, k): v for k, v in raw.items()}
-
-    if "GPSInfo" in exif:
-        gps = {}
-        for k, v in exif["GPSInfo"].items():
-            gps[GPSTAGS.get(k, k)] = v
-        exif["GPSInfo"] = gps
-
-    return exif
-
-parser = argparse.ArgumentParser()
-parser.add_argument("card", help="The mounted path of the SD Card")
-parser.add_argument("--folder", help="Optional folder to copy the images to.")
-
-args = parser.parse_args()
-
-home = Path.home()
-
-base_dir =f"{home}/Pictures/Bestof"
-card = args.card
-
-if not os.path.exists(card):
-    print("No SD Card found on that mount.")
-    sys.exit(1)
+from datetime import datetime
+from pathlib import Path
 
 
-folder = f"{base_dir}/{args.folder}" if args.folder else base_dir
-
-if not os.path.exists(folder):
-    os.makedirs(folder)
-
-files = glob(f"{card}/**/*.[jJ][pP][gG]", recursive=True)
-
-for file in files[:50]:
-    print(get_exif(file))
+IMAGE_EXTENSIONS = {".jpg", ".jpeg"}
 
 
+def iter_images(root: Path):
+    for path in root.rglob("*"):
+        if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS:
+            yield path
 
 
+def is_locked(path: Path) -> bool:
+    result = subprocess.run(
+        ["stat", "-f", "%Sf", str(path)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+
+    if result.returncode != 0:
+        return False
+
+    flags = result.stdout.strip()
+    return "uchg" in flags or "schg" in flags
+
+
+def get_exif_date(path: Path) -> str | None:
+    result = subprocess.run(
+        [
+            "exiftool",
+            "-s3",
+            "-d",
+            "%Y-%m-%d_%H-%M-%S",
+            "-DateTimeOriginal",
+            "-CreateDate",
+            str(path),
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+
+    if result.returncode != 0:
+        return None
+
+    lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    return lines[0] if lines else None
+
+
+def get_file_modified_date(path: Path) -> str:
+    modified = datetime.fromtimestamp(path.stat().st_mtime)
+    return modified.strftime("%Y-%m-%d_%H-%M-%S")
+
+
+def copy_locked_images(source: Path, destination: Path):
+    found = 0
+    locked = 0
+    copied = 0
+    skipped = 0
+
+    for image in iter_images(source):
+        found += 1
+
+        if not is_locked(image):
+            continue
+
+        locked += 1
+
+        ts = get_exif_date(image) or get_file_modified_date(image)
+
+        day = ts.split("_")[0]
+        day_folder = destination / day
+        day_folder.mkdir(parents=True, exist_ok=True)
+
+        output = day_folder / f"{ts}_{image.stem}{image.suffix}"
+
+        if output.exists():
+            skipped += 1
+            print(f"{output} already copied.")
+            continue
+
+        print(f"Copying: {image} -> {output.name}")
+        shutil.copy2(image, output)
+        copied += 1
+
+    return found, locked, copied, skipped
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("card", help="The mounted path of the SD card")
+    parser.add_argument("--folder", help="Optional folder name inside ~/Pictures/Bestof")
+
+    args = parser.parse_args()
+
+    if shutil.which("exiftool") is None:
+        print("exiftool is not installed or not available in PATH.")
+        print("On macOS you can install it with: brew install exiftool")
+        sys.exit(1)
+
+    source = Path(args.card).expanduser().resolve()
+
+    if not source.is_dir():
+        print(f"Source folder not found: {source}")
+        sys.exit(1)
+
+    destination = Path.home() / "Pictures" / "Bestof"
+
+    if args.folder:
+        destination = destination / args.folder
+
+    destination.mkdir(parents=True, exist_ok=True)
+
+    found, locked, copied, skipped = copy_locked_images(source, destination)
+
+    print("Done.")
+    print(f"Found images: {found}")
+    print(f"Locked images: {locked}")
+    print(f"Copied: {copied}")
+    print(f"Skipped existing: {skipped}")
+
+
+if __name__ == "__main__":
+    main()
