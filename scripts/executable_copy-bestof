@@ -88,7 +88,7 @@ def copy_locked_images(source: Path, destination: Path):
             continue
 
         print(f"Copying: {image} -> {output.name}")
-        shutil.copy2(image, output)
+        shutil.copy(image, output)
         copied += 1
 
     return found, locked, copied, skipped
