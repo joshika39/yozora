@@ -1,58 +1,72 @@
 #!/usr/bin/env python3
 
 import argparse
+import os.path
 import shutil
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-
+from typing import Any, Generator
+import platform
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg"}
 
+VIDEO_EXTENSIONS = {".mp4", ".mov"}
 
-def iter_images(root: Path):
-    for path in root.rglob("*"):
-        if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS:
+IMAGE_PATTERN = "*.[jJ][pP][gG]"
+
+VIDEO_PATTERN = "*.mp4"
+
+
+def iter_files(root: Path, pattern: str, extensions: set[str]) -> Generator[Path, Any, None]:
+    for path in root.rglob(pattern):
+        if path.is_file() and path.suffix.lower() in extensions:
             yield path
 
 
 def is_locked(path: Path) -> bool:
-    result = subprocess.run(
-        ["stat", "-f", "%Sf", str(path)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-        text=True,
-    )
+    if platform.system() == "Darwin" or platform.system() == "Linux":
+        result = subprocess.run(
+            ["stat", "-f", "%Sf", str(path)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
 
-    if result.returncode != 0:
-        return False
+        if result.returncode != 0:
+            return False
 
-    flags = result.stdout.strip()
-    return "uchg" in flags or "schg" in flags
+        flags = result.stdout.strip()
+        return "uchg" in flags or "schg" in flags
+    else:
+        return not os.access(path, os.W_OK)
 
 
 def get_exif_date(path: Path) -> str | None:
-    result = subprocess.run(
-        [
-            "exiftool",
-            "-s3",
-            "-d",
-            "%Y-%m-%d_%H-%M-%S",
-            "-DateTimeOriginal",
-            "-CreateDate",
-            str(path),
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-        text=True,
-    )
+    if platform.system() == "Darwin" or platform.system() == "Linux":
+        result = subprocess.run(
+            [
+                "exiftool",
+                "-s3",
+                "-d",
+                "%Y-%m-%d_%H-%M-%S",
+                "-DateTimeOriginal",
+                "-CreateDate",
+                str(path),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
 
-    if result.returncode != 0:
+        if result.returncode != 0:
+            return None
+
+        lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        return lines[0] if lines else None
+    else:
         return None
-
-    lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-    return lines[0] if lines else None
 
 
 def get_file_modified_date(path: Path) -> str:
@@ -66,7 +80,7 @@ def copy_locked_images(source: Path, destination: Path):
     copied = 0
     skipped = 0
 
-    for image in iter_images(source):
+    for image in iter_files(source, IMAGE_PATTERN, IMAGE_EXTENSIONS):
         found += 1
 
         if not is_locked(image):
@@ -94,10 +108,32 @@ def copy_locked_images(source: Path, destination: Path):
     return found, locked, copied, skipped
 
 
+def copy_videos(source: Path, destination: Path):
+    found = 0
+    copied = 0
+    skipped = 0
+    for video in iter_files(source, VIDEO_PATTERN, VIDEO_EXTENSIONS):
+        found += 1
+
+        destination = destination / video.stem
+
+        if destination.exists():
+            skipped += 1
+            print(f"{destination} already copied.")
+            continue
+
+        print(f"Copying: {video} -> {destination.name}")
+        shutil.copy(video, destination)
+        copied += 1
+
+    return found, skipped, copied
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("card", help="The mounted path of the SD card")
     parser.add_argument("--folder", help="Optional folder name inside ~/Pictures/Bestof")
+    parser.add_argument("--videos", action="store_true", help="Also copy videos")
 
     args = parser.parse_args()
 
@@ -120,12 +156,16 @@ def main():
     destination.mkdir(parents=True, exist_ok=True)
 
     found, locked, copied, skipped = copy_locked_images(source, destination)
+    found_videos, skipped_videos, copied_videos = copy_videos(source, destination)
 
     print("Done.")
     print(f"Found images: {found}")
     print(f"Locked images: {locked}")
     print(f"Copied: {copied}")
     print(f"Skipped existing: {skipped}")
+    print(f"Found videos: {found_videos}")
+    print(f"Copied videos: {copied_videos}")
+    print(f"Skipped existing videos: {skipped_videos}")
 
 
 if __name__ == "__main__":
