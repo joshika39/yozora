@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Generator
 import platform
+import PIL.Image
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg"}
 
@@ -43,30 +44,51 @@ def is_locked(path: Path) -> bool:
         return not os.access(path, os.W_OK)
 
 
-def get_exif_date(path: Path) -> str | None:
-    if platform.system() == "Darwin" or platform.system() == "Linux":
-        result = subprocess.run(
-            [
-                "exiftool",
-                "-s3",
-                "-d",
-                "%Y-%m-%d_%H-%M-%S",
-                "-DateTimeOriginal",
-                "-CreateDate",
-                str(path),
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            text=True,
-        )
+def get_exif_date_with_exif_tool(path: Path) -> str | None:
+    result = subprocess.run(
+        [
+            "exiftool",
+            "-s3",
+            "-d",
+            "%Y-%m-%d_%H-%M-%S",
+            "-DateTimeOriginal",
+            "-CreateDate",
+            str(path),
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
 
-        if result.returncode != 0:
-            return None
-
-        lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-        return lines[0] if lines else None
-    else:
+    if result.returncode != 0:
         return None
+
+    lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    return lines[0] if lines else None
+
+
+def get_exif_date_with_pil(path: Path) -> str | None:
+    try:
+        with PIL.Image.open(path) as img:
+            exif_data = img._getexif()
+            if not exif_data:
+                return None
+
+            date_str = exif_data.get(36867) or exif_data.get(306)
+            if not date_str:
+                return None
+
+            dt = datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S")
+            return dt.strftime("%Y-%m-%d_%H-%M-%S")
+    except Exception:
+        return None
+
+
+def get_exif_date(path: Path) -> str | None:
+    if shutil.which("exiftool") is None:
+        return get_exif_date_with_pil(path)
+    else:
+        return get_exif_date_with_exif_tool(path)
 
 
 def get_file_modified_date(path: Path) -> str:
@@ -136,11 +158,6 @@ def main():
     parser.add_argument("--videos", action="store_true", help="Also copy videos")
 
     args = parser.parse_args()
-
-    if shutil.which("exiftool") is None:
-        print("exiftool is not installed or not available in PATH.")
-        print("On macOS you can install it with: brew install exiftool")
-        sys.exit(1)
 
     source = Path(args.card).expanduser().resolve()
 
