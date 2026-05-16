@@ -17,11 +17,11 @@ VIDEO_EXTENSIONS = {".mp4", ".mov"}
 
 IMAGE_PATTERN = "*.[jJ][pP][gG]"
 
-VIDEO_PATTERN = "*.mp4"
+VIDEO_PATTERN = "*.[mM][pP]4"
 
 
-def iter_files(root: Path, pattern: str, extensions: set[str]) -> Generator[Path, Any, None]:
-    for path in root.rglob(pattern):
+def iter_files(root: Path, extensions: set[str]) -> Generator[Path, Any, None]:
+    for path in root.rglob("*"):
         if path.is_file() and path.suffix.lower() in extensions:
             yield path
 
@@ -102,7 +102,7 @@ def copy_locked_images(source: Path, destination: Path):
     copied = 0
     skipped = 0
 
-    for image in iter_files(source, IMAGE_PATTERN, IMAGE_EXTENSIONS):
+    for image in iter_files(source, IMAGE_EXTENSIONS):
         found += 1
 
         if not is_locked(image):
@@ -134,18 +134,19 @@ def copy_videos(source: Path, destination: Path):
     found = 0
     copied = 0
     skipped = 0
-    for video in iter_files(source, VIDEO_PATTERN, VIDEO_EXTENSIONS):
+
+    for video in iter_files(source, VIDEO_EXTENSIONS):
         found += 1
 
-        destination = destination / video.stem
+        output = destination / video.name
 
-        if destination.exists():
+        if output.exists():
             skipped += 1
-            print(f"{destination} already copied.")
+            print(f"{output} already copied.")
             continue
 
-        print(f"Copying: {video} -> {destination.name}")
-        shutil.copy(video, destination)
+        print(f"Copying: {video} -> {output.name}")
+        shutil.copy(video, output)
         copied += 1
 
     return found, skipped, copied
@@ -173,16 +174,17 @@ def main():
     destination.mkdir(parents=True, exist_ok=True)
 
     found, locked, copied, skipped = copy_locked_images(source, destination)
-    found_videos, skipped_videos, copied_videos = copy_videos(source, destination)
-
     print("Done.")
     print(f"Found images: {found}")
     print(f"Locked images: {locked}")
     print(f"Copied: {copied}")
     print(f"Skipped existing: {skipped}")
-    print(f"Found videos: {found_videos}")
-    print(f"Copied videos: {copied_videos}")
-    print(f"Skipped existing videos: {skipped_videos}")
+
+    if args.videos:
+        found_videos, skipped_videos, copied_videos = copy_videos(source, destination)
+        print(f"Found videos: {found_videos}")
+        print(f"Copied videos: {copied_videos}")
+        print(f"Skipped existing videos: {skipped_videos}")
 
 
 if __name__ == "__main__":
