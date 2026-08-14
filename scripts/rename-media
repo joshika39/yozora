@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+folder="${1:-}"
+
+if [[ -z "$folder" || ! -d "$folder" ]]; then
+	echo "Usage: $0 <folder>"
+	exit 1
+fi
+
+find "$folder" -maxdepth 1 -type f \( \
+	-iname "*.raf" -o \
+	-iname "*.jpg" -o \
+	-iname "*.jpeg" -o \
+	-iname "*.mov" \
+	\) -print0 |
+	while IFS= read -r -d '' file; do
+		dir="$(dirname "$file")"
+		filename="$(basename "$file")"
+
+		# Skip files already prefixed with an ISO date.
+		if [[ "$filename" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}_ ]]; then
+			echo "Skipping: $filename"
+			continue
+		fi
+
+		# Actual capture date from EXIF metadata.
+		date="$(exiftool -s3 -DateTimeOriginal -d "%Y-%m-%d" "$file")"
+
+		# MOV files often store capture time as CreateDate instead.
+		if [[ -z "$date" ]]; then
+			date="$(exiftool -s3 -CreateDate -d "%Y-%m-%d" "$file")"
+		fi
+
+		if [[ -z "$date" ]]; then
+			echo "No capture date: $filename"
+			continue
+		fi
+
+		new_name="${date}_${filename}"
+
+		if [[ -e "$dir/$new_name" ]]; then
+			echo "Already exists: $new_name"
+			continue
+		fi
+
+		echo "$filename -> $new_name"
+		mv -- "$file" "$dir/$new_name"
+	done
