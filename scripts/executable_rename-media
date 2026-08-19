@@ -19,18 +19,15 @@ find "$folder" -maxdepth 1 -type f \( \
 		dir="$(dirname "$file")"
 		filename="$(basename "$file")"
 
-		# Skip files already prefixed with an ISO date.
 		if [[ "$filename" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}_ ]]; then
 			echo "Skipping: $filename"
 			continue
 		fi
 
-		# Actual capture date from EXIF metadata.
-		date="$(exiftool -s3 -DateTimeOriginal -d "%Y-%m-%d" "$file")"
+		date="$(exiftool -s3 -DateTimeOriginal -d "%Y-%m-%dT%H-%M-%S" "$file")"
 
-		# MOV files often store capture time as CreateDate instead.
 		if [[ -z "$date" ]]; then
-			date="$(exiftool -s3 -CreateDate -d "%Y-%m-%d" "$file")"
+			date="$(exiftool -s3 -CreateDate -d "%Y-%m-%dT%H-%M-%S" "$file")"
 		fi
 
 		if [[ -z "$date" ]]; then
@@ -45,6 +42,17 @@ find "$folder" -maxdepth 1 -type f \( \
 			continue
 		fi
 
+		base="${filename%.*}"
+
 		echo "$filename -> $new_name"
 		mv -- "$file" "$dir/$new_name"
+
+		sidecar="$dir/${base}.photo-edit"
+
+		if [[ -f "$sidecar" ]]; then
+			new_sidecar="$dir/${date}_${base}.photo-edit"
+
+			echo "${base}.photo-edit -> ${date}_${base}.photo-edit"
+			mv -- "$sidecar" "$new_sidecar"
+		fi
 	done
