@@ -12,13 +12,14 @@ yabai -m rule --add app="kitty" space=^1
 # space 2: web
 yabai -m rule --${COMMAND} app="Safari" space=${FOLLOW}2
 
-# space 4: jetbrains development | vscode
+# space 4: jetbrains development | vscode | xcode
 JETBRAIN_APPS="JetBrains Rider.*|PhpStorm.*|WebStorm.*|IntelliJ IDEA.*|PyCharm.*"
 JETBRAIN_DIALOGS="Preferences|Settings|Rename|Add File to Git|Delete|Manage Licenses|Copy|Move|Refactor|Conflicts|Merge Revisions for.*"
 PYCHARM_DIALOGS="Creating Virtual Environments"
 yabai -m rule --${COMMAND} app="${JETBRAIN_APPS}" space=${FOLLOW}4
 yabai -m rule --${COMMAND} app="${JETBRAIN_APPS}" title="${JETBRAIN_DIALOGS}|${PYCHARM_DIALOGS}" space=${FOLLOW}4 manage=off
 yabai -m rule --${COMMAND} app="Visual Studio Code" space=${FOLLOW}4
+yabai -m rule --${COMMAND} app="Xcode" space=${FOLLOW}4
 
 # space 5: todo and notes and brainstorming
 yabai -m rule --${COMMAND} app="Things" space=${FOLLOW}5
